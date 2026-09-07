@@ -36,8 +36,12 @@ Spotify built and did not ship) and Experimental, which holds AI Chat (Martini).
 telemetry blocking with a count of what it has stopped; Navbar, the tab bar's own composition; and
 All flags, Spotify's remote-config flags with a search field and an Auto / Off / On control per flag
 (a text field for the number and text ones). A flag switch on a page forces that one flag and off
-leaves Spotify's own value, so the All flags page is where a flag goes back to Auto. A change shows
-after Spotify restarts.
+leaves Spotify's own value, so the All flags page is where a flag goes back to Auto. Spotify ships
+its newer design behind several flags at once, so UI Tweaks > Spotify's own Liquid Glass owns them
+(the glass navigation bar, the new player slider, the sheet style player, the queue and Connect
+sheets, the redesigned player header, the sleep timer's options sheet): while it is on it forces
+each of them, and their rows elsewhere show what it forces and take no touch, so the group has one
+switch. `SGGlassOwnsFlag` in SGCommon.m holds the list. A change shows after Spotify restarts.
 
 Navbar is the exception and applies as soon as the bar lays out again. It lists the tabs in the order
 the bar shows them: drag to reorder, tap to hide or show, and Add a tab puts a page of Spotify's or

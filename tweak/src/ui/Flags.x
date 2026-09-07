@@ -1,13 +1,11 @@
 // Spotify reads every remote-config flag once at startup through the configuration provider,
 // keyed "component.property". An override from the Flags page wins; the Spotify's own Liquid
-// Glass switch then forces the glass navigation bar Spotify ships switched off.
+// Glass switch then forces the flags of Spotify's own newer design, which it ships switched off.
 #import "SGCommon.h"
-
-static NSString *const kGlassKey = @"ios-reprise-liquid-glass-properties.context_menu_in_navigation_bar_enabled";
 
 static id forced(NSString *key) {
     id value = SGFlagOverride(key);
-    if (!value && [key isEqualToString:kGlassKey] && SGEnabled(SGKeySpotifyGlass)) value = @YES;
+    if (!value && SGEnabled(SGKeySpotifyGlass) && SGGlassOwnsFlag(key)) value = @YES;
     return value;
 }
 

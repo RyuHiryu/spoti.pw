@@ -112,6 +112,11 @@ extern NSString *const SGFlagOverridePrefix;
 id SGFlagOverride(NSString *key);
 void SGSetFlagOverride(NSString *key, id value);
 
+// Spotify ships its newer design behind several flags at once, so the Spotify's own Liquid Glass
+// switch owns them all: ui/Flags.x forces each one while it is on and ui/Settings.x locks their
+// rows, which is what keeps the switch and the rows from contradicting each other.
+BOOL SGGlassOwnsFlag(NSString *key);
+
 // Declutter switches from ui/Settings.x, read by ui/Declutter.x; an unset switch is off.
 #define SGHideShuffle @"spotifyglass.hide.shuffle"
 #define SGHideRepeat @"spotifyglass.hide.repeat"

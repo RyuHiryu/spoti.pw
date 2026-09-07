@@ -223,6 +223,12 @@ static BOOL flagRowOn(SGModRow *row) {
     return value && [value boolValue] != row.forceOff;
 }
 
+// A flag the Spotify's own Liquid Glass switch owns: its row shows what that switch forces and
+// takes no touch, so the flag has one place to change. An override from All flags still wins.
+static BOOL flagRowLocked(SGModRow *row) {
+    return row.flag && SGGlassOwnsFlag(row.key) && SGEnabled(SGKeySpotifyGlass);
+}
+
 static const CGFloat kSectionHeaderHeight = 38;
 
 // Every page below draws Spotify's own list row: a 13pt white title over an 11pt grey subtitle,
@@ -367,7 +373,9 @@ static UITableViewCell *dequeue(UITableView *table, NSString *identifier) {
     if (row.key) {
         UISwitch *toggle = [UISwitch new];
         toggle.onTintColor = green();
-        toggle.on = row.flag ? flagRowOn(row) : SGFlag(row.key, row.defaultOn);
+        BOOL locked = flagRowLocked(row);
+        toggle.on = row.flag ? (locked && !SGFlagOverride(row.key) ? YES : flagRowOn(row)) : SGFlag(row.key, row.defaultOn);
+        toggle.enabled = !locked;
         toggle.tag = path.section * 1000 + path.row;
         [toggle addTarget:self action:@selector(toggled:) forControlEvents:UIControlEventValueChanged];
         cell.accessoryView = toggle;
@@ -895,7 +903,7 @@ static UIViewController *uiTweaksPage(void) {
         section(@"Liquid Glass", @[
             switchRow(@"Tab bar", @"Glass pill behind the tabs, no labels", SGKeyTabBar),
             switchRow(@"Search field", @"Glass capsule instead of the white field", SGKeySearchField),
-            switchRow(@"Spotify's own Liquid Glass", @"Turns on the glass navigation bar Spotify ships switched off", SGKeySpotifyGlass),
+            switchRow(@"Spotify's own Liquid Glass", @"The glass navigation bar, the new player slider and the new sheets, all shipped switched off", SGKeySpotifyGlass),
         ]),
         section(@"Theme", @[
             switchRow(@"AMOLED background", @"Pure black instead of Spotify's dark grey", SGKeyAmoled),
@@ -1060,6 +1068,8 @@ static UIViewController *playbackPage(void) {
             flagRow(@"Lyrics over Canvas", @"ios-feature-canvas.lyrics_on_canvas_enabled"),
             flagRow(@"Mixing transitions", @"ios-feature-canvas.mixing_transition_enabled"),
             flagRow(@"Picture in picture in the app", @"ios-feature-picture-in-picture.picture_in_picture_in_app"),
+            flagRow(@"Connect as a bottom sheet", @"ios-feature-nowplaying-elements.enable_connect_bottom_sheet"),
+            flagRow(@"Connect sheet from the video switcher", @"ios-playbackcontrol-audiovideoswitcher-impl.enable_connect_bottom_sheet"),
         ]),
         section(@"Now playing bar", @[
             flagRow(@"Hold and drag to resize", @"ios-feature-nowplayingbar.hold_and_drag_to_resize"),

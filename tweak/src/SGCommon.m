@@ -121,6 +121,24 @@ void SGSetFlagOverride(NSString *key, id value) {
     else [NSUserDefaults.standardUserDefaults removeObjectForKey:key];
 }
 
+BOOL SGGlassOwnsFlag(NSString *key) {
+    static NSSet<NSString *> *owned;
+    static dispatch_once_t once;
+    dispatch_once(&once, ^{
+        owned = [NSSet setWithArray:@[
+            @"ios-reprise-liquid-glass-properties.context_menu_in_navigation_bar_enabled",
+            @"ios-feature-encoreexperiments.new_npv_slider_enabled",
+            @"ios-feature-nowplaying.sheet_style_npv",
+            @"ios-feature-nowplaying.bottom_sheet_queue_enabled",
+            @"ios-feature-nowplaying.new_redesign_header_with_context_menu_enabled",
+            @"ios-feature-nowplaying-elements.enable_connect_bottom_sheet",
+            @"ios-playbackcontrol-audiovideoswitcher-impl.enable_connect_bottom_sheet",
+            @"ios-feature-sleeptimer.use_options_sheet",
+        ]];
+    });
+    return [owned containsObject:key];
+}
+
 #pragma mark - view tree
 
 void SGForEachView(UIView *view, void (^fn)(UIView *)) {

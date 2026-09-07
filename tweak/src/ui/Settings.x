@@ -945,6 +945,9 @@ static UIViewController *nowPlayingPage(void) {
             flagRow(@"Picture in picture", @"ios-feature-nowplaying.picture_in_picture"),
             flagRow(@"Video in the mini player", @"ios-feature-nowplaying.video_in_miniplayer"),
         ]),
+        section(@"Lock screen", @[
+            flagRow(@"Like and dislike buttons", @"ios-feature-lockscreen.like_dislike_enabled"),
+        ]),
         section(@"Hide buttons", @[
             hideRow(@"Shuffle", @"Left of the playback controls", SGHideShuffle),
             hideRow(@"Repeat", @"Right of the playback controls", SGHideRepeat),
@@ -966,6 +969,20 @@ static UIViewController *nowPlayingPage(void) {
             hideRow(@"Credits", @"Performers and writers", SGHideCredits),
             hideRow(@"Merch", @"The artist's shop", SGHideMerch),
             hideRow(@"Recommendations", @"\"Artist: what you might like\", the episode and track rows", SGHideRecommendations),
+        ]),
+    ] footer:nil];
+}
+
+static UIViewController *lockScreenPage(void) {
+    return [[SGModPage alloc] initWithTitle:@"Lock screen widget" intro:kRestart sections:@[
+        section(@"Spotify's flags", @[
+            flagRow(@"Like and dislike buttons", @"ios-feature-lockscreen.like_dislike_enabled"),
+            flagRow(@"Animated artwork", @"ios-feature-lockscreen.animated_artwork_enabled"),
+            flagRow(@"Video artwork", @"ios-feature-lockscreen.vit_artwork_enabled"),
+            flagRow(@"Companion content", @"ios-feature-lockscreen.companion_content_enabled"),
+            flagRow(@"Burst skip", @"ios-feature-lockscreen.burst_skip_enabled"),
+            flagRow(@"Chapter skip controls", @"ios-feature-lockscreen.enable_chapter_skip_controls"),
+            flagRow(@"Skip button on podcasts", @"ios-feature-lockscreen.skip_button_on_podcasts"),
         ]),
     ] footer:nil];
 }
@@ -1017,6 +1034,7 @@ static UIViewController *modSettingsPage(void) {
             pageRow(@"Home", @"Gradient background, hide sections of the Home tab", ^UIViewController *{ return homePage(); }),
             pageRow(@"Playlist", @"Hide the cover, the header buttons and the pills", ^UIViewController *{ return playlistPage(); }),
             pageRow(@"Now Playing", @"Glass, Spotify's player flags, hide buttons and cards", ^UIViewController *{ return nowPlayingPage(); }),
+            pageRow(@"Lock screen widget", @"The like and dislike buttons on the lock screen", ^UIViewController *{ return lockScreenPage(); }),
             pageRow(@"Privacy", @"Block telemetry, and what it has blocked so far", ^UIViewController *{ return privacyPage(); }),
             pageRow(@"All flags", @"Search and force any of Spotify's remote-config flags", ^UIViewController *{ return [SGFlagsPage new]; }),
         ]),

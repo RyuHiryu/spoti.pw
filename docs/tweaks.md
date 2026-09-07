@@ -25,13 +25,14 @@ are read out of Spotify's own binary and belong to whoever built them.
 
 ## Mod Settings
 
-Settings → Mod Settings has four pages of switches: UI Tweaks (tab bar, search field, Spotify's own
+Settings → Mod Settings has five pages of switches: UI Tweaks (tab bar, search field, Spotify's own
 glass, AMOLED), Home (a gradient background, hide sections of the Home tab), Playlist (hide the
-cover, the header's text and buttons, the curation pills) and Now Playing (glass, a few of Spotify's
-player flags, hide buttons and cards of the full screen player). Then Privacy, telemetry blocking
-with a count of what it has stopped; Navbar, the tab bar's own composition; and All flags, Spotify's
-remote-config flags with a search field and an Auto / Off / On control per flag (a text field for the
-number and text ones). A change shows after Spotify restarts.
+cover, the header's text and buttons, the curation pills), Now Playing (glass, a few of Spotify's
+player flags, hide buttons and cards of the full screen player) and Lock screen widget (the like and
+dislike buttons and the rest of Spotify's lock screen flags). Then Privacy, telemetry blocking with a count of what
+it has stopped; Navbar, the tab bar's own composition; and All flags, Spotify's remote-config flags
+with a search field and an Auto / Off / On control per flag (a text field for the number and text
+ones). A change shows after Spotify restarts.
 
 Navbar is the exception and applies as soon as the bar lays out again. It lists the tabs in the order
 the bar shows them: drag to reorder, tap to hide or show, and Add a tab puts a page of Spotify's or

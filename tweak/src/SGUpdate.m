@@ -4,7 +4,7 @@
 #import "SGCommon.h"
 
 NSString *const SGSiteURL = @"https://spoti.pw";
-NSString *const SGRepoURL = @"https://github.com/CHANGEME/CHANGEME";
+NSString *const SGRepoURL = @"https://github.com/skopevoj/spoti.pw";
 NSString *const SGChatURL = @"https://t.me/CHANGEME";
 NSString *const SGUpdateURL = @"https://spoti.pw/version.json";
 

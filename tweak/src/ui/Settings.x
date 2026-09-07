@@ -901,7 +901,7 @@ static NSString *const kRestart = @"Changes apply after you restart Spotify.";
 static UIViewController *uiTweaksPage(void) {
     return [[SGModPage alloc] initWithTitle:@"UI Tweaks" intro:kRestart sections:@[
         section(@"Liquid Glass", @[
-            switchRow(@"Tab bar", @"Glass pill behind the tabs, no labels", SGKeyTabBar),
+            switchRow(@"Tab bar", @"[WIP] Unstable", SGKeyTabBar),
             switchRow(@"Search field", @"Glass capsule instead of the white field", SGKeySearchField),
             switchRow(@"Spotify's own Liquid Glass", @"The glass navigation bar, the new player slider and the new sheets, all shipped switched off", SGKeySpotifyGlass),
         ]),

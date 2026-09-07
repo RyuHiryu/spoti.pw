@@ -109,7 +109,8 @@ static BOOL sg_pagesConform;
 @end
 
 // A row is a switch when it has a key and a link to another page when it has a page. A flag row
-// switches one of Spotify's remote-config flags: on forces it, off leaves Spotify's value. A row
+// switches one of Spotify's remote-config flags: on forces it (off for a forceOff row, which is how
+// a flag Spotify ships on is turned off), the switch off leaves Spotify's own value. A row
 // with a value reads one out on the right and is asked again while the page is open; a row with an
 // action runs it when tapped.
 @interface SGModRow : NSObject
@@ -118,6 +119,7 @@ static BOOL sg_pagesConform;
 @property (nonatomic, copy) NSString *key;
 @property (nonatomic) BOOL defaultOn;
 @property (nonatomic) BOOL flag;
+@property (nonatomic) BOOL forceOff;
 @property (nonatomic, copy) UIViewController *(^page)(void);
 @property (nonatomic, copy) NSString *(^value)(void);
 @property (nonatomic, copy) void (^action)(void);
@@ -162,6 +164,13 @@ static SGModRow *flagRow(NSString *title, NSString *key) {
     return row;
 }
 
+// A flag Spotify ships on: the switch forces it off.
+static SGModRow *killRow(NSString *title, NSString *key) {
+    SGModRow *row = flagRow(title, key);
+    row.forceOff = YES;
+    return row;
+}
+
 static SGModRow *statRow(NSString *title, NSString *(^value)(void)) {
     SGModRow *row = [SGModRow new];
     row.title = title;
@@ -177,10 +186,10 @@ static SGModRow *actionRow(NSString *title, NSString *subtitle, void (^action)(v
     return row;
 }
 
-static SGModRow *pageRow(NSString *title, NSString *subtitle, UIViewController *(^page)(void)) {
+// No subtitle: a list of pages reads as a list, not as a wall of explanations.
+static SGModRow *pageRow(NSString *title, UIViewController *(^page)(void)) {
     SGModRow *row = [SGModRow new];
     row.title = title;
-    row.subtitle = subtitle;
     row.page = page;
     return row;
 }
@@ -205,6 +214,13 @@ static SGModSection *section(NSString *title, NSArray<SGModRow *> *rows) {
     s.title = title;
     s.rows = rows;
     return s;
+}
+
+// On means the row's own override is in place; anything else, including the opposite override
+// somebody set from the All flags page, reads as off.
+static BOOL flagRowOn(SGModRow *row) {
+    id value = SGFlagOverride(row.key);
+    return value && [value boolValue] != row.forceOff;
 }
 
 static const CGFloat kSectionHeaderHeight = 38;
@@ -351,7 +367,7 @@ static UITableViewCell *dequeue(UITableView *table, NSString *identifier) {
     if (row.key) {
         UISwitch *toggle = [UISwitch new];
         toggle.onTintColor = green();
-        toggle.on = row.flag ? [SGFlagOverride(row.key) boolValue] : SGFlag(row.key, row.defaultOn);
+        toggle.on = row.flag ? flagRowOn(row) : SGFlag(row.key, row.defaultOn);
         toggle.tag = path.section * 1000 + path.row;
         [toggle addTarget:self action:@selector(toggled:) forControlEvents:UIControlEventValueChanged];
         cell.accessoryView = toggle;
@@ -383,7 +399,7 @@ static UITableViewCell *dequeue(UITableView *table, NSString *identifier) {
 
 - (void)toggled:(UISwitch *)toggle {
     SGModRow *row = [self rowAt:[NSIndexPath indexPathForRow:toggle.tag % 1000 inSection:toggle.tag / 1000]];
-    if (row.flag) SGSetFlagOverride(row.key, toggle.on ? @YES : nil);
+    if (row.flag) SGSetFlagOverride(row.key, toggle.on ? @(!row.forceOff) : nil);
     else SGSetEnabled(row.key, toggle.on);
 }
 
@@ -888,7 +904,7 @@ static UIViewController *uiTweaksPage(void) {
 }
 
 static UIViewController *homePage(void) {
-    return [[SGModPage alloc] initWithTitle:@"Home" intro:kRestart sections:@[
+    return [[SGModPage alloc] initWithTitle:@"Home & Library" intro:kRestart sections:@[
         section(@"Background", @[
             optionRow(@"Gradient", @"A green wash behind the top of the page, fading into the background", SGKeyHomeGradient),
         ]),
@@ -898,6 +914,20 @@ static UIViewController *homePage(void) {
             hideRow(@"Promo cards", @"Single cards such as the next episode of a podcast", SGHideHomePromo),
             hideRow(@"Preview cards", @"Album, playlist and video previews with a play button", SGHideHomePreviews),
             hideRow(@"DJ card", @"Your own personal DJ", SGHideHomeDJ),
+        ]),
+        section(@"Spotify's flags", @[
+            flagRow(@"Pull to refresh", @"ios-home-evopage-impl.pull_to_refresh_enabled"),
+            flagRow(@"Hide items from Recents", @"ios-system-home-hidefromhome.is_hide_from_recents_enabled"),
+            flagRow(@"Hide items from Shortcuts", @"ios-system-home-hidefromhome.is_hide_from_shortcuts_enabled"),
+        ]),
+        section(@"Library", @[
+            flagRow(@"Denser rows", @"ios-feature-yourlibaryx.denser_rows_enabled"),
+            flagRow(@"Recents", @"ios-feature-yourlibaryx.recents_enabled"),
+            flagRow(@"Recents sort order", @"ios-feature-yourlibaryx.recents_sort_order_enabled"),
+            flagRow(@"Sort playlists by recently updated", @"ios-feature-yourlibaryx.recently_updated_playlists_sort_enabled"),
+            flagRow(@"Sort artists by recently updated", @"ios-feature-yourlibaryx.recently_updated_artists_sort_enabled"),
+            flagRow(@"Library settings", @"ios-feature-yourlibaryx.library_settings_enabled"),
+            flagRow(@"Library Pro", @"ios-feature-yourlibaryx.your_library_pro_enabled"),
         ]),
     ] footer:nil];
 }
@@ -920,6 +950,22 @@ static UIViewController *playlistPage(void) {
         section(@"Hide over the tracks", @[
             hideRow(@"Curation pills", @"Add, Mix, Video, Edit, Sort and the rest", SGHidePlaylistPills),
             hideRow(@"Find and sort bar", @"Find on page and Sort, under the header", SGHidePlaylistFind),
+        ]),
+    ] footer:nil];
+}
+
+static UIViewController *lyricsPage(void) {
+    return [[SGModPage alloc] initWithTitle:@"Lyrics" intro:kRestart sections:@[
+        section(@"Spotify's flags", @[
+            flagRow(@"Translations in the player", @"ios-feature-lyrics.enable_lyrics_multilanguage_npv"),
+            flagRow(@"Translations full screen", @"ios-feature-lyrics.enable_lyrics_multilanguage_fullscreen"),
+            flagRow(@"Keep lyrics offline", @"ios-feature-lyrics.lyrics_offline_enabled"),
+            flagRow(@"Vocal removal", @"ios-feature-lyrics.enable_vocal_removal"),
+            flagRow(@"Lyrics toggle in the context menu", @"ios-feature-lyrics.lyrics_context_menu_toggle_enabled"),
+            flagRow(@"Dynamic colours", @"ios-feature-lyrics.enable_dynamic_colors"),
+            flagRow(@"Centre a single line", @"ios-feature-lyrics.is_single_line_centering_enabled"),
+            flagRow(@"Full screen on track change", @"ios-feature-lyrics.enable_fullscreen_track_change"),
+            flagRow(@"Edit lyrics", @"ios-feature-lyrics.lyrics_edit_enabled"),
         ]),
     ] footer:nil];
 }
@@ -970,6 +1016,9 @@ static UIViewController *nowPlayingPage(void) {
             hideRow(@"Merch", @"The artist's shop", SGHideMerch),
             hideRow(@"Recommendations", @"\"Artist: what you might like\", the episode and track rows", SGHideRecommendations),
         ]),
+        section(nil, @[
+            pageRow(@"Lyrics", ^UIViewController *{ return lyricsPage(); }),
+        ]),
     ] footer:nil];
 }
 
@@ -983,6 +1032,129 @@ static UIViewController *lockScreenPage(void) {
             flagRow(@"Burst skip", @"ios-feature-lockscreen.burst_skip_enabled"),
             flagRow(@"Chapter skip controls", @"ios-feature-lockscreen.enable_chapter_skip_controls"),
             flagRow(@"Skip button on podcasts", @"ios-feature-lockscreen.skip_button_on_podcasts"),
+        ]),
+    ] footer:nil];
+}
+
+static UIViewController *playbackPage(void) {
+    return [[SGModPage alloc] initWithTitle:@"Playback" intro:kRestart sections:@[
+        section(@"Speed", @[
+            flagRow(@"Speed control for music", @"ios-playbackcontrol-playbackspeed-impl.enable_playback_speed_for_music"),
+            flagRow(@"Trim silence", @"ios-playbackcontrol-playbackspeed-impl.enable_trim_silence"),
+            flagRow(@"Speed shortcuts", @"ios-playbackcontrol-playbackspeed-impl.enable_speed_shortcuts_v2"),
+        ]),
+        section(@"Queue", @[
+            flagRow(@"Swipe a row to play next", @"ios-feature-queue.is_swipe_to_play_next_enabled"),
+            flagRow(@"Play next in the context menu", @"ios-feature-queue.is_play_next_context_menu_enabled"),
+            flagRow(@"Reshuffle", @"ios-feature-queue.is_reshuffle_enabled"),
+            flagRow(@"Peek the queue when adding", @"ios-feature-queue.is_queue_peek_on_add_enabled"),
+        ]),
+        section(@"Player", @[
+            flagRow(@"Pinch to zoom", @"ios-feature-nowplaying-fullscreen.pinch_to_zoom"),
+            flagRow(@"Audio settings in the menu", @"ios-nowplaying-contextmenusettings-impl.audio_settings"),
+            flagRow(@"Playback settings in the menu", @"ios-nowplaying-contextmenusettings-impl.playback_settings"),
+            flagRow(@"Video settings in the menu", @"ios-nowplaying-contextmenusettings-impl.video_settings"),
+            flagRow(@"New progress slider", @"ios-feature-encoreexperiments.new_npv_slider_enabled"),
+            flagRow(@"Tilt the cover art", @"ios-creativeworkcommons-cover-art-tilt-configuration-kit.cover_art_tilt_enabled"),
+            flagRow(@"Tilt it on album and playlist pages", @"ios-creativeworkcommons-cover-art-tilt-configuration-kit.album_playlist_and_podcast_pages_enabled"),
+            flagRow(@"Lyrics over Canvas", @"ios-feature-canvas.lyrics_on_canvas_enabled"),
+            flagRow(@"Mixing transitions", @"ios-feature-canvas.mixing_transition_enabled"),
+            flagRow(@"Picture in picture in the app", @"ios-feature-picture-in-picture.picture_in_picture_in_app"),
+        ]),
+        section(@"Now playing bar", @[
+            flagRow(@"Hold and drag to resize", @"ios-feature-nowplayingbar.hold_and_drag_to_resize"),
+            flagRow(@"Save button", @"ios-feature-nowplayingbar.add_button"),
+            flagRow(@"Queue badge", @"ios-feature-nowplayingbar.queue_badge"),
+            flagRow(@"Two lines of track info", @"ios-feature-nowplayingbar.two_lines_information_unit"),
+        ]),
+        section(@"Spotify's settings", @[
+            flagRow(@"Offline listening toggle", @"ios-feature-settings.enable_offline_listening_toggle"),
+            flagRow(@"Gapless in Playback settings", @"ios-feature-settings.use_playback_settings_gapless"),
+        ]),
+    ] footer:nil];
+}
+
+// Every switch here forces a flag Spotify ships on to off, so the switch off is Spotify's own value.
+static UIViewController *adsPage(void) {
+    return [[SGModPage alloc] initWithTitle:@"Ads & nags" intro:kRestart sections:@[
+        section(@"Ads", @[
+            killRow(@"Ad when the app opens", @"ios-feature-adonappopen.enabled"),
+            killRow(@"Its CTA card", @"ios-feature-adonappopen.cta_card_enabled"),
+        ]),
+        section(@"Upsells", @[
+            killRow(@"Shuffle toggle upsell", @"ios-feature-shuffletoggleupsell.is_enabled_pt2"),
+            killRow(@"Shuffle upsell in the video player", @"ios-feature-nowplaying-modes.video_first_shuffle_upsell_enabled"),
+        ]),
+        section(@"Badges", @[
+            killRow(@"DJ beta badge", @"ios-home-evopage-impl.dj_mdc_beta_badge_enabled"),
+            killRow(@"DJ button on Home", @"ios-home-evopage-impl.idj_show_dj_button"),
+        ]),
+        section(@"Tooltips", @[
+            killRow(@"Data saver", @"ios-feature-nowplayingbar.data_saver_tooltip"),
+            killRow(@"Smart shuffle helper", @"ios-messaging-reduceinterventions-impl.enable_message_smart_shuffle_helper_tooltip"),
+            killRow(@"Watch feed explorer", @"ios-messaging-reduceinterventions-impl.enable_message_watch_feed_entity_explorer_tooltip"),
+            killRow(@"AI playlist creation", @"ios-messaging-reduceinterventions-impl.enable_message_your_library_ai_playlist_creation_tooltip"),
+            killRow(@"Account switching", @"ios-messaging-reduceinterventions-impl.enable_message_account_switching_tooltip"),
+            killRow(@"Concert notifications", @"ios-messaging-reduceinterventions-impl.enable_message_live_events_concert_notifications_tooltip"),
+            killRow(@"Live event", @"ios-messaging-reduceinterventions-impl.enable_message_live_events_event_entity_safe_tooltip"),
+            killRow(@"Live event venue", @"ios-messaging-reduceinterventions-impl.enable_message_live_events_event_entity_venuename_header_tooltip"),
+            killRow(@"Player suggestions upsell", @"ios-messaging-reduceinterventions-impl.enable_message_reinvent_free_n_p_v_suggestions_upsell"),
+            killRow(@"Puffin nudge", @"ios-messaging-reduceinterventions-impl.enable_message_puffin_nudge_end_optimization"),
+        ]),
+        section(nil, @[
+            flagRow(@"Reduce interventions", @"ios-messaging-reduceinterventions-impl.enabled"),
+        ]),
+    ] footer:@"The tooltip switches belong to Spotify's own intervention-reduction system, which the last switch turns on."];
+}
+
+static UIViewController *unreleasedPage(void) {
+    return [[SGModPage alloc] initWithTitle:@"Unreleased" intro:kRestart sections:@[
+        section(@"Player", @[
+            flagRow(@"Snake on the cover art", @"ios-feature-cover-art-snake.enabled"),
+            flagRow(@"SongDNA", @"ios-songdna-featureproperties.is_song_dna_enabled"),
+            flagRow(@"SongDNA covers playlist", @"ios-songdna-featureproperties.enable_go_to_covers_playlist"),
+        ]),
+        section(@"Podcast comments", @[
+            flagRow(@"Comments card", @"ios-feature-comments.enable_comments_card"),
+            flagRow(@"Pinned comments", @"ios-feature-comments.enable_pinned_comments"),
+            flagRow(@"Several reactions", @"ios-feature-comments.enable_multi_reactions"),
+        ]),
+        section(@"Sleep timer", @[
+            flagRow(@"Fade out", @"ios-feature-sleeptimer.enable_fade_out"),
+            flagRow(@"One minute option", @"ios-feature-sleeptimer.enable_one_minute_option"),
+            flagRow(@"Options sheet", @"ios-feature-sleeptimer.use_options_sheet"),
+        ]),
+        section(@"Elsewhere", @[
+            flagRow(@"Local files from the Files app", @"ios-feature-localfiles.documents_enabled"),
+            flagRow(@"Progress bar in the home screen widget", @"ios-widgets-widgetremoteconfig-impl.progress_bar_enabled"),
+        ]),
+    ] footer:nil];
+}
+
+static UIViewController *martiniPage(void) {
+    return [[SGModPage alloc] initWithTitle:@"AI Chat (Martini)" intro:kRestart sections:@[
+        section(@"On Home", @[
+            flagRow(@"Chat entry point", @"ios-home-evopage-impl.interactive_entrypoint_enabled"),
+            flagRow(@"Martini behind it", @"ios-home-evopage-impl.interactive_entrypoint_martini_enabled"),
+            flagRow(@"Floating chat", @"ios-home-evopage-impl.interactive_entrypoint_floating_chat_enabled"),
+            flagRow(@"Microphone", @"ios-home-evopage-impl.interactive_entrypoint_mic_enabled"),
+            flagRow(@"Glowing pill", @"ios-home-evopage-impl.interactive_entrypoint_pill_glow_enabled"),
+        ]),
+        section(@"The chat", @[
+            flagRow(@"Intent pills", @"ios-martini-floatingchat-impl.intent_pills_enabled"),
+            flagRow(@"Thinking states", @"ios-martini-floatingchat-impl.thinking_states_enabled"),
+            flagRow(@"Voice recording", @"ios-martini-floatingchat-impl.voice_recording_enabled"),
+        ]),
+        section(@"In the player", @[
+            flagRow(@"Chat entry point", @"ios-martini-npvcardprovider-impl.floating_chat_entry_point_enabled"),
+        ]),
+    ] footer:nil];
+}
+
+static UIViewController *experimentalPage(void) {
+    return [[SGModPage alloc] initWithTitle:@"Experimental" intro:nil sections:@[
+        section(nil, @[
+            pageRow(@"AI Chat (Martini)", ^UIViewController *{ return martiniPage(); }),
         ]),
     ] footer:nil];
 }
@@ -1020,7 +1192,6 @@ static SGModSection *aboutSection(void) {
         }, ^{ SGCheckForUpdate(YES); }),
         linkRow(@"Website", @"Downloads, and the source to add to AltStore or SideStore", SGSiteURL),
         linkRow(@"GitHub", @"Source, releases and issues", SGRepoURL),
-        linkRow(@"Telegram", @"Updates and support", SGChatURL),
     ]);
 }
 
@@ -1029,14 +1200,18 @@ static UIViewController *modSettingsPage(void) {
     SGCheckForUpdate(NO);
     return [[SGModPage alloc] initWithTitle:@"Mod Settings" intro:nil sections:@[
         section(nil, @[
-            pageRow(@"UI Tweaks", @"Liquid Glass • AMOLED background", ^UIViewController *{ return uiTweaksPage(); }),
-            pageRow(@"Navbar", @"Reorder the tabs, hide them, add your own", ^UIViewController *{ return [SGNavbarPage new]; }),
-            pageRow(@"Home", @"Gradient background, hide sections of the Home tab", ^UIViewController *{ return homePage(); }),
-            pageRow(@"Playlist", @"Hide the cover, the header buttons and the pills", ^UIViewController *{ return playlistPage(); }),
-            pageRow(@"Now Playing", @"Glass, Spotify's player flags, hide buttons and cards", ^UIViewController *{ return nowPlayingPage(); }),
-            pageRow(@"Lock screen widget", @"The like and dislike buttons on the lock screen", ^UIViewController *{ return lockScreenPage(); }),
-            pageRow(@"Privacy", @"Block telemetry, and what it has blocked so far", ^UIViewController *{ return privacyPage(); }),
-            pageRow(@"All flags", @"Search and force any of Spotify's remote-config flags", ^UIViewController *{ return [SGFlagsPage new]; }),
+            pageRow(@"UI Tweaks", ^UIViewController *{ return uiTweaksPage(); }),
+            pageRow(@"Navbar", ^UIViewController *{ return [SGNavbarPage new]; }),
+            pageRow(@"Home & Library", ^UIViewController *{ return homePage(); }),
+            pageRow(@"Playlist", ^UIViewController *{ return playlistPage(); }),
+            pageRow(@"Now Playing", ^UIViewController *{ return nowPlayingPage(); }),
+            pageRow(@"Lock screen widget", ^UIViewController *{ return lockScreenPage(); }),
+            pageRow(@"Playback", ^UIViewController *{ return playbackPage(); }),
+            pageRow(@"Ads & nags", ^UIViewController *{ return adsPage(); }),
+            pageRow(@"Unreleased", ^UIViewController *{ return unreleasedPage(); }),
+            pageRow(@"Experimental", ^UIViewController *{ return experimentalPage(); }),
+            pageRow(@"Privacy", ^UIViewController *{ return privacyPage(); }),
+            pageRow(@"All flags", ^UIViewController *{ return [SGFlagsPage new]; }),
         ]),
         aboutSection(),
     ] footer:nil];
@@ -1050,7 +1225,6 @@ static UIViewController *modSettingsPage(void) {
 @implementation SGModSettingsRow {
     UIImageView *_icon;
     UILabel *_title;
-    UILabel *_subtitle;
     UIImageView *_chevron;
 }
 
@@ -1060,14 +1234,8 @@ static UIViewController *modSettingsPage(void) {
     _title = [UILabel new];
     _title.text = @"Mod Settings";
     _title.textColor = UIColor.whiteColor;
-    _subtitle = [UILabel new];
-    _subtitle.text = @"UI Tweaks • Navbar • Home • Playlist • Now Playing • Privacy • Flags";
-    _subtitle.textColor = grey();
-    // One page too many for the row on a narrow phone.
-    _subtitle.adjustsFontSizeToFitWidth = YES;
-    _subtitle.minimumScaleFactor = 0.8;
     _chevron = symbol(@"chevron.right", 11, UIImageSymbolWeightSemibold, 12);
-    for (UIView *v in @[_icon, _title, _subtitle, _chevron]) [self addSubview:v];
+    for (UIView *v in @[_icon, _title, _chevron]) [self addSubview:v];
     [self addTarget:self action:@selector(open) forControlEvents:UIControlEventTouchUpInside];
     return self;
 }
@@ -1075,12 +1243,10 @@ static UIViewController *modSettingsPage(void) {
 - (void)layoutSubviews {
     [super layoutSubviews];
     _title.font = titleFont();
-    _subtitle.font = subtitleFont();
-    CGFloat width = self.bounds.size.width;
-    _icon.frame = CGRectMake(12, 16, 24, 24);
-    _title.frame = CGRectMake(48, 9, width - 96, 18);
-    _subtitle.frame = CGRectMake(48, 31, width - 96, 16);
-    _chevron.frame = CGRectMake(width - 24, 22, 12, 12);
+    CGFloat width = self.bounds.size.width, height = self.bounds.size.height;
+    _icon.frame = CGRectMake(12, (height - 24) / 2, 24, 24);
+    _title.frame = CGRectMake(48, 0, width - 96, height);
+    _chevron.frame = CGRectMake(width - 24, (height - 12) / 2, 12, 12);
 }
 
 - (void)setHighlighted:(BOOL)highlighted {

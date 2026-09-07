@@ -160,7 +160,6 @@ void SGResetBlocked(void);
 // callback. SGCheckForUpdate(NO) respects a six hour cache, SGCheckForUpdate(YES) always asks.
 extern NSString *const SGSiteURL;
 extern NSString *const SGRepoURL;
-extern NSString *const SGChatURL;
 extern NSString *const SGUpdateURL;
 NSString *SGUpdateVersion(void);  // nil unless the site has one newer than this build
 NSString *SGUpdateNotes(void);

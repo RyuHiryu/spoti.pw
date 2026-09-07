@@ -25,14 +25,19 @@ are read out of Spotify's own binary and belong to whoever built them.
 
 ## Mod Settings
 
-Settings → Mod Settings has five pages of switches: UI Tweaks (tab bar, search field, Spotify's own
-glass, AMOLED), Home (a gradient background, hide sections of the Home tab), Playlist (hide the
-cover, the header's text and buttons, the curation pills), Now Playing (glass, a few of Spotify's
-player flags, hide buttons and cards of the full screen player) and Lock screen widget (the like and
-dislike buttons and the rest of Spotify's lock screen flags). Then Privacy, telemetry blocking with a count of what
-it has stopped; Navbar, the tab bar's own composition; and All flags, Spotify's remote-config flags
-with a search field and an Auto / Off / On control per flag (a text field for the number and text
-ones). A change shows after Spotify restarts.
+Settings → Mod Settings lists its pages without a description each, so the list reads as a list: UI
+Tweaks (tab bar, search field, Spotify's own glass, AMOLED), Home & Library (a gradient background,
+hide sections of the Home tab, Spotify's home and library flags), Playlist (hide the cover, the
+header's text and buttons, the curation pills), Now Playing (glass, Spotify's player flags, hide
+buttons and cards of the full screen player, and a Lyrics page under it), Lock screen widget,
+Playback (speed, queue, the player and the now playing bar), Ads & nags (every switch forces a flag
+Spotify ships on to off: the ad on app open, upsells, tooltips, the DJ badge), Unreleased (features
+Spotify built and did not ship) and Experimental, which holds AI Chat (Martini). Then Privacy,
+telemetry blocking with a count of what it has stopped; Navbar, the tab bar's own composition; and
+All flags, Spotify's remote-config flags with a search field and an Auto / Off / On control per flag
+(a text field for the number and text ones). A flag switch on a page forces that one flag and off
+leaves Spotify's own value, so the All flags page is where a flag goes back to Auto. A change shows
+after Spotify restarts.
 
 Navbar is the exception and applies as soon as the bar lays out again. It lists the tabs in the order
 the bar shows them: drag to reorder, tap to hide or show, and Add a tab puts a page of Spotify's or

@@ -23,3 +23,8 @@
 #define SGHideHomePromo @"spotifyglass.hide.homePromo"
 #define SGHideHomePreviews @"spotifyglass.hide.homePreviews"
 #define SGHideHomeDJ @"spotifyglass.hide.homeDJ"
+
+// The welcome tour's one switch for the player: on sets every hide key of the now playing screen
+// but the two lyrics ones, off clears them. Only the tour reads it; the hooks read the keys above.
+#define SGKeyPlayerLyricsOnly @"spotifyglass.hide.playerLyricsOnly"
+void SGSetPlayerLyricsOnly(BOOL on);

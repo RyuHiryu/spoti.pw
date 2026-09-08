@@ -6,6 +6,9 @@
 #import "Features/Appearance/Appearance.h"
 #import "Features/Flags/Flags.h"
 #import "Features/Home/Home.h"
+#import "Features/Declutter/Declutter.h"
+#import "Features/Navbar/Navbar.h"
+#import "Features/Privacy/Privacy.h"
 
 static const CGFloat kMargin = 24;
 static const CGFloat kCardRadius = 22;
@@ -157,9 +160,12 @@ static SGTourRow *actionRow(NSString *symbol, NSString *title, NSString *subtitl
 
 #pragma mark - pages
 
-@interface SGTourPage : UIViewController
+@interface SGTourPage : UIViewController <UINavigationControllerDelegate>
 @property (nonatomic, copy) NSString *symbol, *heading, *body;
 @property (nonatomic, copy) NSArray<SGTourRow *> *rows;
+// In place of the card: a page of the mod's own, filling the rest of the screen and scrolling
+// itself. Its navigation bar shows only for what it pushes.
+@property (nonatomic, strong) UIViewController *embedded;
 @property (nonatomic) NSInteger index;
 @property (nonatomic, weak) UIViewController *owner;
 @end
@@ -171,12 +177,6 @@ static SGTourRow *actionRow(NSString *symbol, NSString *title, NSString *subtitl
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    UIScrollView *scroll = [UIScrollView new];
-    scroll.alwaysBounceVertical = YES;
-    scroll.showsVerticalScrollIndicator = NO;
-    scroll.translatesAutoresizingMaskIntoConstraints = NO;
-    [self.view addSubview:scroll];
-
     SGGlassView *halo = [SGGlassView new];
     halo.capsule = YES;
     _hero = SGSymbolView(self.symbol, 34, UIImageSymbolWeightMedium, 88);
@@ -218,25 +218,51 @@ static SGTourRow *actionRow(NSString *symbol, NSString *title, NSString *subtitl
     halo.translatesAutoresizingMaskIntoConstraints = NO;
     [strip addSubview:halo];
 
-    UIStackView *column = [[UIStackView alloc] initWithArrangedSubviews:@[strip, heading, body, card]];
+    UIStackView *column = [[UIStackView alloc] initWithArrangedSubviews:self.embedded ? @[strip, heading, body] : @[strip, heading, body, card]];
     column.axis = UILayoutConstraintAxisVertical;
     column.spacing = 10;
     [column setCustomSpacing:28 afterView:strip];
     [column setCustomSpacing:28 afterView:body];
     column.translatesAutoresizingMaskIntoConstraints = NO;
-    [scroll addSubview:column];
 
-    UILayoutGuide *frame = scroll.frameLayoutGuide, *content = scroll.contentLayoutGuide;
+    if (self.embedded) {
+        [self.view addSubview:column];
+        [self addChildViewController:self.embedded];
+        UIView *inner = self.embedded.view;
+        inner.translatesAutoresizingMaskIntoConstraints = NO;
+        [self.view addSubview:inner];
+        [self.embedded didMoveToParentViewController:self];
+        [NSLayoutConstraint activateConstraints:@[
+            [column.topAnchor constraintEqualToAnchor:self.view.topAnchor constant:24],
+            [column.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:kMargin],
+            [column.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-kMargin],
+            [inner.topAnchor constraintEqualToAnchor:column.bottomAnchor constant:8],
+            [inner.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
+            [inner.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
+            [inner.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
+        ]];
+    } else {
+        UIScrollView *scroll = [UIScrollView new];
+        scroll.alwaysBounceVertical = YES;
+        scroll.showsVerticalScrollIndicator = NO;
+        scroll.translatesAutoresizingMaskIntoConstraints = NO;
+        [self.view addSubview:scroll];
+        [scroll addSubview:column];
+        UILayoutGuide *frame = scroll.frameLayoutGuide, *content = scroll.contentLayoutGuide;
+        [NSLayoutConstraint activateConstraints:@[
+            [scroll.topAnchor constraintEqualToAnchor:self.view.topAnchor],
+            [scroll.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
+            [scroll.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
+            [scroll.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
+            [column.topAnchor constraintEqualToAnchor:content.topAnchor constant:24],
+            [column.bottomAnchor constraintEqualToAnchor:content.bottomAnchor constant:-24],
+            [column.leadingAnchor constraintEqualToAnchor:content.leadingAnchor constant:kMargin],
+            [column.trailingAnchor constraintEqualToAnchor:content.trailingAnchor constant:-kMargin],
+            [column.widthAnchor constraintEqualToAnchor:frame.widthAnchor constant:-2 * kMargin],
+        ]];
+    }
+
     [NSLayoutConstraint activateConstraints:@[
-        [scroll.topAnchor constraintEqualToAnchor:self.view.topAnchor],
-        [scroll.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
-        [scroll.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
-        [scroll.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
-        [column.topAnchor constraintEqualToAnchor:content.topAnchor constant:24],
-        [column.bottomAnchor constraintEqualToAnchor:content.bottomAnchor constant:-24],
-        [column.leadingAnchor constraintEqualToAnchor:content.leadingAnchor constant:kMargin],
-        [column.trailingAnchor constraintEqualToAnchor:content.trailingAnchor constant:-kMargin],
-        [column.widthAnchor constraintEqualToAnchor:frame.widthAnchor constant:-2 * kMargin],
         [halo.leadingAnchor constraintEqualToAnchor:strip.leadingAnchor],
         [halo.topAnchor constraintEqualToAnchor:strip.topAnchor],
         [halo.bottomAnchor constraintEqualToAnchor:strip.bottomAnchor],
@@ -249,6 +275,10 @@ static SGTourRow *actionRow(NSString *symbol, NSString *title, NSString *subtitl
         [list.leadingAnchor constraintEqualToAnchor:card.leadingAnchor],
         [list.trailingAnchor constraintEqualToAnchor:card.trailingAnchor],
     ]];
+}
+
+- (void)navigationController:(UINavigationController *)nav willShowViewController:(UIViewController *)page animated:(BOOL)animated {
+    [nav setNavigationBarHidden:page == nav.viewControllers.firstObject animated:animated];
 }
 
 // The symbol bounces the first time the page lands; the page is already on screen during the
@@ -291,6 +321,20 @@ static SGTourRow *actionRow(NSString *symbol, NSString *title, NSString *subtitl
     return page;
 }
 
+// The Navbar page as it is in Mod Settings, over the scrim instead of its own black, in a
+// navigation controller of its own so Add a tab has somewhere to push.
+- (SGTourPage *)navbarPage {
+    SGTourPage *page = [self pageWithSymbol:@"dock.rectangle" heading:@"Your tabs." body:@"Drag to reorder, tap to hide, add any Spotify link as a tab of its own. The bar follows straight away." rows:@[]];
+    UIViewController *editor = SGNavbarSettingsPage();
+    editor.view.backgroundColor = UIColor.clearColor;
+    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:editor];
+    nav.navigationBarHidden = YES;
+    nav.delegate = page;
+    nav.view.backgroundColor = UIColor.clearColor;
+    page.embedded = nav;
+    return page;
+}
+
 - (NSArray<SGTourPage *> *)buildPages {
     __weak typeof(self) weakSelf = self;
     SGTourRow *glass = switchRow(@"drop.fill", @"Liquid Glass UI", @"Spotify's own glass bars and sheets, the search field, now playing bar, artwork background and lyrics", SGKeySpotifyGlass, NO);
@@ -299,7 +343,7 @@ static SGTourRow *actionRow(NSString *symbol, NSString *title, NSString *subtitl
     premium.warning = SGFakePremiumWarning;
     NSMutableArray *pages = [NSMutableArray array];
     _pages = pages;
-    [pages addObject:[self pageWithSymbol:@"music.note" heading:@"Spotify, in glass." body:@"Spotify with a Liquid Glass rebuild on top. Every piece sits behind its own switch; the next two pages are the ones worth choosing now." rows:@[
+    [pages addObject:[self pageWithSymbol:@"music.note" heading:@"Spotify, in glass." body:@"Spotify with a Liquid Glass rebuild on top. Every piece sits behind its own switch; the pages that follow are the ones worth choosing now." rows:@[
         plainRow(@"play.circle.fill", @"Glass player and now playing bar", @"The header, the bar, search and lyrics in glass"),
         plainRow(@"moon.fill", @"Pure black AMOLED", @"With a Home gradient in any of eight colours"),
         plainRow(@"dock.rectangle", @"A tab bar you compose", @"Reorder, hide, add any Spotify link"),
@@ -310,11 +354,16 @@ static SGTourRow *actionRow(NSString *symbol, NSString *title, NSString *subtitl
         switchRow(@"moon.fill", @"AMOLED background", @"Pure black instead of Spotify's dark grey", SGKeyAmoled, NO),
         switchRow(@"paintpalette.fill", @"Home gradient", @"A wash of colour behind the top of Home", SGKeyHomeGradient, NO),
     ]]];
-    [pages addObject:[self pageWithSymbol:@"eye.slash.fill" heading:@"Ads and nags." body:@"From EeveeSpotify. All three are off until switched on, and none is needed on a Premium account." rows:@[
+    [pages addObject:[self pageWithSymbol:@"eye.slash.fill" heading:@"Ads and privacy." body:@"The ad switches come from EeveeSpotify, off until switched on and not needed on a Premium account. Telemetry blocking is on from the start." rows:@[
         switchRow(@"speaker.slash.fill", @"Hide ads", @"Ad services never start, ad slots leave Home and Search", SGKeyHideAds, NO),
         switchRow(@"hand.raised.fill", @"Hide upsells", @"Premium prompts, banners and sheets dropped", SGKeyHideUpsells, NO),
         premium,
+        switchRow(@"antenna.radiowaves.left.and.right.slash", @"Block telemetry", @"Analytics requests answered empty instead of let out", SGKeyBlockTelemetry, YES),
     ]]];
+    SGTourRow *lyricsOnly = switchRow(@"rectangle.compress.vertical", @"Only the lyrics", @"Hides everything on the now playing screen except lyrics: the buttons around the controls and every card under the player", SGKeyPlayerLyricsOnly, NO);
+    lyricsOnly.changed = ^(BOOL on) { SGSetPlayerLyricsOnly(on); };
+    [pages addObject:[self pageWithSymbol:@"rectangle.compress.vertical" heading:@"Declutter." body:@"The player, down to the music. Every piece has a switch of its own under Now Playing in Mod Settings." rows:@[lyricsOnly]]];
+    [pages addObject:[self navbarPage]];
     [pages addObject:[self pageWithSymbol:@"slider.horizontal.3" heading:@"Everything lives in Mod Settings." body:@"Spotify's Settings, last row. Every switch, the tab bar editor and all of Spotify's flags.\n\nFree and open source. A star is what keeps it going." rows:@[
         actionRow(@"star.fill", @"Star on GitHub", @"skopevoj/spoti.pw", ^{ SGOpenURL(SGRepoURL); }),
         actionRow(@"square.and.arrow.up", @"Share spoti.pw", @"Send the site to someone", ^{ [weakSelf share]; }),

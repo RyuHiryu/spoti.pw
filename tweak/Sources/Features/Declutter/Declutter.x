@@ -144,8 +144,7 @@ static void finish(UIViewController *unit, BOOL changed) {
 %end
 
 void SGSetPlayerLyricsOnly(BOOL on) {
-    for (NSString *key in @[SGHideShuffle, SGHideRepeat, SGHideConnect, SGHideShare, SGHideQueue, SGHideAddTo,
-                            SGHideAboutArtist, SGHideRelatedVideos, SGHideSongDNA, SGHideLiveEvents,
+    for (NSString *key in @[SGHideAboutArtist, SGHideRelatedVideos, SGHideSongDNA, SGHideLiveEvents,
                             SGHideExploreArtist, SGHideCredits, SGHideMerch, SGHideRecommendations]) {
         SGSetEnabled(key, on);
     }

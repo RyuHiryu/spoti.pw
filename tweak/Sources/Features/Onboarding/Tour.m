@@ -360,7 +360,7 @@ static SGTourRow *actionRow(NSString *symbol, NSString *title, NSString *subtitl
         premium,
         switchRow(@"antenna.radiowaves.left.and.right.slash", @"Block telemetry", @"Analytics requests answered empty instead of let out", SGKeyBlockTelemetry, YES),
     ]]];
-    SGTourRow *lyricsOnly = switchRow(@"rectangle.compress.vertical", @"Only the lyrics", @"Hides everything on the now playing screen except lyrics: the buttons around the controls and every card under the player", SGKeyPlayerLyricsOnly, NO);
+    SGTourRow *lyricsOnly = switchRow(@"rectangle.compress.vertical", @"Only the lyrics", @"Hides every card under the player except lyrics: about the artist, videos, song DNA, credits, merch and the rest", SGKeyPlayerLyricsOnly, NO);
     lyricsOnly.changed = ^(BOOL on) { SGSetPlayerLyricsOnly(on); };
     [pages addObject:[self pageWithSymbol:@"rectangle.compress.vertical" heading:@"Declutter." body:@"The player, down to the music. Every piece has a switch of its own under Now Playing in Mod Settings." rows:@[lyricsOnly]]];
     [pages addObject:[self navbarPage]];

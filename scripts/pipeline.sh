@@ -44,7 +44,7 @@ need dpkg-deb "brew install dpkg"
 need cyan "uv tool install 'cyan @ git+https://github.com/asdfzxcvbn/pyzule-rw'"
 ls "$THEOS"/sdks/iPhoneOS*.sdk >/dev/null 2>&1 || { echo "no iPhoneOS SDK in $THEOS/sdks" >&2; exit 1; }
 
-APP_DIR="$(unzip -Z1 "$IN" | grep -oE '^Payload/[^/]+\.app/' | head -1)"
+APP_DIR="$(unzip -Z1 "$IN" | grep -oE '^Payload/[^/]+\.app/' | sort -u | head -1)"
 [ -n "$APP_DIR" ] || { echo "no Payload/*.app in $IN" >&2; exit 1; }
 VERSION="$(unzip -p "$IN" "${APP_DIR}Info.plist" > "$ROOT/out/.info.plist" && plutil -extract CFBundleShortVersionString raw -o - "$ROOT/out/.info.plist")"
 rm -f "$ROOT/out/.info.plist"

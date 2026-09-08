@@ -36,7 +36,7 @@ stage() {
   [ -f "$out" ] || die "pipeline did not report a built IPA"
 
   local app_dir plist
-  app_dir="$(unzip -Z1 "$out" | grep -oE '^Payload/[^/]+\.app/' | head -1)"
+  app_dir="$(unzip -Z1 "$out" | grep -oE '^Payload/[^/]+\.app/' | sort -u | head -1)"
   plist="$(mktemp)"
   unzip -p "$out" "${app_dir}Info.plist" > "$plist"
   local spotify build bundle min_os

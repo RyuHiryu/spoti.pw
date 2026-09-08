@@ -2,9 +2,10 @@
 // Appearance (with the Navbar, the tab bar's own composition, under it), Home & Library, Playlist
 // and Player, each sections of switches (the mod's own and a few of Spotify's remote-config
 // flags), Ads & privacy and Labs, All flags, a searchable list of every flag with an override per
-// flag, and Mod, the build, its updates and links. The tweaks read the switches when they run, so
-// a change shows after Spotify restarts; the Navbar page is the exception and applies as soon as
-// the bar lays out again.
+// flag, and Mod, the build, its updates and links. The same row leads the side drawer's list
+// (trees/test6.txt), above Your plan, so the page is a tap from Home. The tweaks read the switches
+// when they run, so a change shows after Spotify restarts; the Navbar page is the exception and
+// applies as soon as the bar lays out again.
 //
 // Tree (trees/settings.txt): SettingsListViewController.view > SettingsListCollectionView of
 //   Element_List cells 402x56: 24pt icon at x 12, 13pt white title and 11pt grey subtitle at
@@ -59,9 +60,12 @@ static UIViewController *modSettingsPage(void) {
     return [[SGModPage alloc] initWithTitle:@"spoti.pw" intro:nil sections:sections footer:nil];
 }
 
-#pragma mark - row in the settings list
+#pragma mark - row in the settings list and the side drawer
 
+// The last row of Spotify's settings list, chevron and all, or the first of the side drawer's,
+// drawn like the drawer's own rows: no chevron, icon and title 4pt further in.
 @interface SGModSettingsRow : UIControl
+@property (nonatomic) BOOL drawer;
 @end
 
 @implementation SGModSettingsRow {
@@ -85,10 +89,11 @@ static UIViewController *modSettingsPage(void) {
 - (void)layoutSubviews {
     [super layoutSubviews];
     _title.font = SGTitleFont();
-    CGFloat width = self.bounds.size.width, height = self.bounds.size.height;
-    _icon.frame = CGRectMake(12, (height - 24) / 2, 24, 24);
-    _title.frame = CGRectMake(48, 0, width - 96, height);
+    CGFloat width = self.bounds.size.width, height = self.bounds.size.height, lead = self.drawer ? 4 : 0;
+    _icon.frame = CGRectMake(12 + lead, (height - 24) / 2, 24, 24);
+    _title.frame = CGRectMake(48 + lead, 0, width - 96, height);
     _chevron.frame = CGRectMake(width - 24, (height - 12) / 2, 12, 12);
+    _chevron.hidden = self.drawer;
 }
 
 - (void)setHighlighted:(BOOL)highlighted {
@@ -96,27 +101,47 @@ static UIViewController *modSettingsPage(void) {
     self.alpha = highlighted ? 0.5 : 1;
 }
 
+static UINavigationController *navigationIn(UIViewController *page) {
+    if ([page isKindOfClass:UINavigationController.class]) return (UINavigationController *)page;
+    for (UIViewController *child in page.childViewControllers) {
+        UINavigationController *found = navigationIn(child);
+        if (found) return found;
+    }
+    return nil;
+}
+
+// The drawer is presented over the app, so its row closes it first and pushes onto the stack it
+// was covering, the way the drawer's own rows open their pages.
 - (void)open {
     UIViewController *owner = nil;
     for (UIResponder *r = self; r && !owner; r = r.nextResponder) {
         if ([r isKindOfClass:UIViewController.class]) owner = (UIViewController *)r;
     }
-    SGShowPage(owner, modSettingsPage());
+    UIViewController *presenting = self.drawer ? owner.presentingViewController : nil;
+    if (!presenting) {
+        SGShowPage(owner, modSettingsPage());
+        return;
+    }
+    [presenting dismissViewControllerAnimated:YES completion:^{
+        SGShowPage(navigationIn(presenting).topViewController ?: presenting, modSettingsPage());
+    }];
 }
 
 @end
 
+// At the end of the settings list, or above the first row of the drawer's, with the inset for it
+// added again whenever Spotify resets the inset.
 static void placeRow(UICollectionView *list, SGModSettingsRow *row) {
     SGAdoptFonts(list, row);
     CGFloat bottom = list.contentSize.height;
-    row.hidden = bottom <= 0;
-    row.frame = CGRectMake(0, bottom, list.bounds.size.width, kRowHeight);
+    row.hidden = !row.drawer && bottom <= 0;
+    row.frame = CGRectMake(0, row.drawer ? -kRowHeight : bottom, list.bounds.size.width, kRowHeight);
 
-    // Room to scroll to the row, added again whenever Spotify resets the inset.
     UIEdgeInsets inset = list.contentInset;
     NSValue *applied = objc_getAssociatedObject(list, &kInsetKey);
     if (applied && UIEdgeInsetsEqualToEdgeInsets(inset, applied.UIEdgeInsetsValue)) return;
-    inset.bottom += kRowHeight;
+    if (row.drawer) inset.top += kRowHeight;
+    else inset.bottom += kRowHeight;
     objc_setAssociatedObject(list, &kInsetKey, [NSValue valueWithUIEdgeInsets:inset], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     list.contentInset = inset;
 }
@@ -168,7 +193,23 @@ static BOOL isSettingsRoot(UIViewController *list) {
 }
 %end
 
-// The list lays out after its controller and again whenever its content changes.
+// The drawer's list (trees/test6.txt: SideDrawerListCollectionView under the profile header, Your
+// plan its first cell) is one of several collection views on the page, so it is found by name.
+%hook _TtC23SideDrawer_ListPageImpl18ListViewController
+- (void)viewDidLayoutSubviews {
+    %orig;
+    SGForEachView(((UIViewController *)self).view, ^(UIView *v) {
+        if (![v isKindOfClass:UICollectionView.class] || ![NSStringFromClass(v.class) containsString:@"SideDrawerListCollectionView"]) return;
+        if (objc_getAssociatedObject(v, &kRowKey)) return;
+        SGModSettingsRow *row = [[SGModSettingsRow alloc] initWithFrame:CGRectZero];
+        row.drawer = YES;
+        objc_setAssociatedObject(v, &kRowKey, row, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        [v addSubview:row];
+    });
+}
+%end
+
+// The lists lay out after their controllers and again whenever their content changes.
 %hook UICollectionView
 - (void)layoutSubviews {
     %orig;
@@ -179,7 +220,7 @@ static BOOL isSettingsRoot(UIViewController *list) {
 
 %ctor {
     %init;
-    SGRequireClasses(@[@"_TtC21Settings_PlatformImpl26SettingsListViewController"]);
+    SGRequireClasses(@[@"_TtC21Settings_PlatformImpl26SettingsListViewController", @"_TtC23SideDrawer_ListPageImpl18ListViewController"]);
     SGRegisterPages();
     SGCheckSigningOnce();
 }

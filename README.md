@@ -112,7 +112,8 @@ reuse it; `make flags` regenerates it.
 
 ## Mod Settings
 
-Settings → Mod Settings is one page per area: Appearance (with Navbar under it), Home & Library,
+Mod Settings, the first row of the side drawer behind your avatar and the last row of Spotify's
+Settings, is one page per area: Appearance (with Navbar under it), Home & Library,
 Playlist and Player; Ads & privacy and Labs; then All flags and Mod, which holds the version,
 updates, links, the welcome tour and the reset. A switch on a page forces one of Spotify's flags;
 off leaves Spotify's own value, and All flags is where a flag goes back to Auto. Navbar applies

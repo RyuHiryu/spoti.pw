@@ -65,7 +65,8 @@ out again, as are the Home gradient's colour, strength and height, but not the s
 
 ## Mod Settings
 
-Settings → Mod Settings is three cards of pages, an icon and no description each, so the list
+Mod Settings, the first row of the side drawer and the last row of Spotify's Settings, is three
+cards of pages, an icon and no description each, so the list
 reads as a list. Appearance (Navbar, the tab bar's own composition, as a page under it; then the
 glass tab bar, search field and Spotify's own glass, AMOLED and the accent colour), Home & Library
 (a Gradient page: the wash behind the top of Home in one of eight colours, at three strengths and

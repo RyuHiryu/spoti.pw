@@ -8,12 +8,10 @@ static UIViewController *lyricsPage(void) {
             SGFlagRow(@"Translations in the player", @"ios-feature-lyrics.enable_lyrics_multilanguage_npv"),
             SGFlagRow(@"Translations full screen", @"ios-feature-lyrics.enable_lyrics_multilanguage_fullscreen"),
             SGFlagRow(@"Keep lyrics offline", @"ios-feature-lyrics.lyrics_offline_enabled"),
-            SGFlagRow(@"Vocal removal", @"ios-feature-lyrics.enable_vocal_removal"),
             SGFlagRow(@"Lyrics toggle in the context menu", @"ios-feature-lyrics.lyrics_context_menu_toggle_enabled"),
             SGFlagRow(@"Dynamic colours", @"ios-feature-lyrics.enable_dynamic_colors"),
             SGFlagRow(@"Centre a single line", @"ios-feature-lyrics.is_single_line_centering_enabled"),
             SGFlagRow(@"Full screen on track change", @"ios-feature-lyrics.enable_fullscreen_track_change"),
-            SGFlagRow(@"Edit lyrics", @"ios-feature-lyrics.lyrics_edit_enabled"),
         ]),
     ] footer:nil];
 }
@@ -32,15 +30,9 @@ UIViewController *SGNowPlayingSettingsPage(void) {
             SGFlagRow(@"Queue flip transition", @"ios-feature-nowplaying.queue_flip_transition_enabled"),
             SGFlagRow(@"Mini player transition animations", @"ios-feature-nowplaying.miniplayer_transition_animations"),
             SGFlagRow(@"Bar to cover art animation", @"ios-feature-nowplaying.bartocoverart_animation_enabled"),
-            SGFlagRow(@"White heart button", @"ios-feature-nowplaying.white_heart_button_in_nowplaying_screen"),
             SGFlagRow(@"Expand the sticky header on tap", @"ios-feature-nowplaying.expand_sticky_header_on_tap"),
-            SGFlagRow(@"Cover art in the header", @"ios-feature-nowplaying.show_header_context_cover_art"),
             SGFlagRow(@"Redesigned header with context menu", @"ios-feature-nowplaying.new_redesign_header_with_context_menu_enabled"),
-            SGFlagRow(@"Picture in picture", @"ios-feature-nowplaying.picture_in_picture"),
             SGFlagRow(@"Video in the mini player", @"ios-feature-nowplaying.video_in_miniplayer"),
-        ]),
-        SGSection(@"Lock screen", @[
-            SGFlagRow(@"Like and dislike buttons", @"ios-feature-lockscreen.like_dislike_enabled"),
         ]),
         SGSection(@"Hide buttons", @[
             SGHideRow(@"Shuffle", @"Left of the playback controls", SGHideShuffle),

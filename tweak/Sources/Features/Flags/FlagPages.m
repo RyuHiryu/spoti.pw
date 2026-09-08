@@ -18,28 +18,11 @@ UIViewController *SGLockScreenSettingsPage(void) {
 
 UIViewController *SGPlaybackSettingsPage(void) {
     return [[SGModPage alloc] initWithTitle:@"Playback" intro:SGRestartNote sections:@[
-        SGSection(@"Speed", @[
-            SGFlagRow(@"Speed control for music", @"ios-playbackcontrol-playbackspeed-impl.enable_playback_speed_for_music"),
-            SGFlagRow(@"Trim silence", @"ios-playbackcontrol-playbackspeed-impl.enable_trim_silence"),
-            SGFlagRow(@"Speed shortcuts", @"ios-playbackcontrol-playbackspeed-impl.enable_speed_shortcuts_v2"),
-        ]),
         SGSection(@"Queue", @[
-            SGFlagRow(@"Swipe a row to play next", @"ios-feature-queue.is_swipe_to_play_next_enabled"),
             SGFlagRow(@"Play next in the context menu", @"ios-feature-queue.is_play_next_context_menu_enabled"),
-            SGFlagRow(@"Reshuffle", @"ios-feature-queue.is_reshuffle_enabled"),
-            SGFlagRow(@"Peek the queue when adding", @"ios-feature-queue.is_queue_peek_on_add_enabled"),
         ]),
         SGSection(@"Player", @[
-            SGFlagRow(@"Pinch to zoom", @"ios-feature-nowplaying-fullscreen.pinch_to_zoom"),
-            SGFlagRow(@"Audio settings in the menu", @"ios-nowplaying-contextmenusettings-impl.audio_settings"),
-            SGFlagRow(@"Playback settings in the menu", @"ios-nowplaying-contextmenusettings-impl.playback_settings"),
-            SGFlagRow(@"Video settings in the menu", @"ios-nowplaying-contextmenusettings-impl.video_settings"),
             SGFlagRow(@"New progress slider", @"ios-feature-encoreexperiments.new_npv_slider_enabled"),
-            SGFlagRow(@"Tilt the cover art", @"ios-creativeworkcommons-cover-art-tilt-configuration-kit.cover_art_tilt_enabled"),
-            SGFlagRow(@"Tilt it on album and playlist pages", @"ios-creativeworkcommons-cover-art-tilt-configuration-kit.album_playlist_and_podcast_pages_enabled"),
-            SGFlagRow(@"Lyrics over Canvas", @"ios-feature-canvas.lyrics_on_canvas_enabled"),
-            SGFlagRow(@"Mixing transitions", @"ios-feature-canvas.mixing_transition_enabled"),
-            SGFlagRow(@"Picture in picture in the app", @"ios-feature-picture-in-picture.picture_in_picture_in_app"),
             SGFlagRow(@"Connect as a bottom sheet", @"ios-feature-nowplaying-elements.enable_connect_bottom_sheet"),
             SGFlagRow(@"Connect sheet from the video switcher", @"ios-playbackcontrol-audiovideoswitcher-impl.enable_connect_bottom_sheet"),
         ]),
@@ -48,10 +31,6 @@ UIViewController *SGPlaybackSettingsPage(void) {
             SGFlagRow(@"Save button", @"ios-feature-nowplayingbar.add_button"),
             SGFlagRow(@"Queue badge", @"ios-feature-nowplayingbar.queue_badge"),
             SGFlagRow(@"Two lines of track info", @"ios-feature-nowplayingbar.two_lines_information_unit"),
-        ]),
-        SGSection(@"Spotify's settings", @[
-            SGFlagRow(@"Offline listening toggle", @"ios-feature-settings.enable_offline_listening_toggle"),
-            SGFlagRow(@"Gapless in Playback settings", @"ios-feature-settings.use_playback_settings_gapless"),
         ]),
     ] footer:nil];
 }
@@ -93,8 +72,6 @@ UIViewController *SGUnreleasedSettingsPage(void) {
     return [[SGModPage alloc] initWithTitle:@"Unreleased" intro:SGRestartNote sections:@[
         SGSection(@"Player", @[
             SGFlagRow(@"Snake on the cover art", @"ios-feature-cover-art-snake.enabled"),
-            SGFlagRow(@"SongDNA", @"ios-songdna-featureproperties.is_song_dna_enabled"),
-            SGFlagRow(@"SongDNA covers playlist", @"ios-songdna-featureproperties.enable_go_to_covers_playlist"),
         ]),
         SGSection(@"Podcast comments", @[
             SGFlagRow(@"Comments card", @"ios-feature-comments.enable_comments_card"),

@@ -45,6 +45,10 @@ app:
     Onboarding/   the welcome tour over Home on the first launch (Onboarding.x, the pages in Tour.m), offered again from About
     About/        the update check and the About section of the root page
 
+Every key a feature stores starts with `spotifyglass.`, whatever it holds: Reset all settings in
+About removes by that prefix and has no list to keep up to date. It leaves `SGKeyStock` behind,
+which makes every unset switch read off, so a reset is stock Spotify whatever switches exist.
+
 A hook reads its switch when it runs (`SGEnabled`, `SGHidden`, `SGFlag` from Core/SGPrefs.h), so a
 change shows after Spotify restarts; Navbar is the exception and applies as soon as the bar lays
 out again, as are the Home gradient's colour, strength and height, but not the switch that turns it on. The root page in `Settings/SGModSettings.x` lists every feature's page by hand.

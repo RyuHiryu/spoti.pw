@@ -1,6 +1,12 @@
 // The mod's own settings, in Spotify's NSUserDefaults. Every key is declared by the feature that
-// owns it, in that feature's header; the accessors here are what the hooks and the pages share.
+// owns it, in that feature's header, and starts with "spotifyglass.": Reset all settings in About
+// sweeps by that prefix and knows no key by name. The accessors here are what the hooks and the
+// pages share.
 #import <Foundation/Foundation.h>
+
+// Set by the reset, after the sweep: an unset switch then reads off rather than the way the build
+// came, so a reset is stock Spotify, for every switch there is and every one added later.
+#define SGKeyStock @"spotifyglass.stock"
 
 BOOL SGFlag(NSString *key, BOOL fallback);
 BOOL SGEnabled(NSString *key);   // an unset switch is on
@@ -17,3 +23,6 @@ void SGSetInt(NSString *key, NSInteger value);
 extern NSString *const SGFlagOverridePrefix;
 id SGFlagOverride(NSString *key);
 void SGSetFlagOverride(NSString *key, id value);
+
+// Quits Spotify so the hooks read the switches afresh on the next launch; the writes reach cfprefsd first.
+void SGRestartSpotify(void);

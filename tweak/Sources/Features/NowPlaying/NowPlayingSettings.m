@@ -19,10 +19,10 @@ static UIViewController *lyricsPage(void) {
 UIViewController *SGNowPlayingSettingsPage(void) {
     return [[SGModPage alloc] initWithTitle:@"Now Playing" intro:SGRestartNote sections:@[
         SGSection(@"Liquid Glass", @[
-            SGSwitchRow(@"Now playing bar", @"Glass card with round artwork", SGKeyNowPlayingBar),
+            SGOptionRow(@"Now playing bar", @"Glass card with round artwork", SGKeyNowPlayingBar),
             SGOptionRow(@"Artwork background", @"The cover blurred and dimmed behind the player instead of the flat album colour", SGKeyPlayerBackdrop),
             SGSwitchRow(@"Header buttons", @"Glass circles behind close and more, over the artwork", SGKeyPlayer),
-            SGSwitchRow(@"Lyrics", @"Glass card, and the page it expands into", SGKeyLyricsCard),
+            SGOptionRow(@"Lyrics", @"Glass card, and the page it expands into", SGKeyLyricsCard),
         ]),
         SGSection(@"Spotify's flags", @[
             SGFlagRow(@"Sheet style player", @"ios-feature-nowplaying.sheet_style_npv"),

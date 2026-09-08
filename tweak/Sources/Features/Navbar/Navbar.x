@@ -108,7 +108,7 @@ static UIView *iconView(NSString *name) {
 - (void)layoutSubviews {
     [super layoutSubviews];
     CGFloat width = self.bounds.size.width;
-    _title.hidden = SGEnabled(SGKeyTabBar);
+    _title.hidden = SGFlag(SGKeyTabBar, NO);
     _title.font = sg_tabFont ?: [UIFont systemFontOfSize:10];
     _title.frame = CGRectMake(0, CGRectGetMinY(sg_labelBox), width, CGRectGetHeight(sg_labelBox));
     _icon.frame = CGRectMake((width - CGRectGetWidth(sg_iconBox)) / 2, CGRectGetMinY(sg_iconBox),

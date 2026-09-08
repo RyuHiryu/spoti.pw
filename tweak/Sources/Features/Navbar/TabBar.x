@@ -25,7 +25,7 @@ static NSArray<UIView *> *tabItems(UIView *tabBar) {
 }
 
 static void styleTabBar(UIView *tabBar) {
-    if (!SGEnabled(SGKeyTabBar)) return;
+    if (!SGFlag(SGKeyTabBar, NO)) return;
     sg_tabBarRoot = tabBar;
     SGStripBackgrounds(tabBar);
     tabBar.superview.layer.backgroundColor = NULL;
@@ -68,7 +68,7 @@ static UIView *tabBarOf(UIView *item) {
 // Items lay out their own icon and label, after the bar; hide the label, centre the icon, then
 // restyle the bar, whose own pass ran before the items had frames.
 static void styleTabItem(UIView *item) {
-    if (!SGEnabled(SGKeyTabBar)) return;
+    if (!SGFlag(SGKeyTabBar, NO)) return;
     CGFloat midY = CGRectGetMidY(item.bounds);
     SGForEachView(item, ^(UIView *v) {
         if ([v isKindOfClass:UILabel.class]) {

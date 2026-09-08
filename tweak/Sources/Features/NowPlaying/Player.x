@@ -153,7 +153,7 @@ static UIView *backdropIn(UIView *plane) {
     fade.colors = @[
         (id)[UIColor colorWithWhite:0 alpha:0.40].CGColor,
         (id)[UIColor colorWithWhite:0 alpha:0.60].CGColor,
-        (id)[UIColor colorWithWhite:0 alpha:SGEnabled(SGKeyAmoled) ? 1 : 0.94].CGColor,
+        (id)[UIColor colorWithWhite:0 alpha:SGFlag(SGKeyAmoled, NO) ? 1 : 0.94].CGColor,
     ];
     fade.locations = @[@0, @0.5, @1];
     [backdrop addSubview:scrim];

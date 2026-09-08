@@ -1,10 +1,37 @@
+#import "Core/SGCore.h"
 #import "Settings/SGPageStyle.h"
 #import "About.h"
 #import "Features/Onboarding/Onboarding.h"
 
+// Every key of the mod's is under one prefix, so a reset is a sweep of the defaults with the stock
+// marker of SGPrefs.h left behind; the hooks read them at launch, so it ends in a restart.
+static void resetAll(void) {
+    NSUserDefaults *store = NSUserDefaults.standardUserDefaults;
+    NSUInteger removed = 0;
+    for (NSString *key in [store persistentDomainForName:NSBundle.mainBundle.bundleIdentifier].allKeys) {
+        if (![key hasPrefix:@"spotifyglass."]) continue;
+        [store removeObjectForKey:key];
+        removed++;
+    }
+    [store setBool:YES forKey:SGKeyStock];
+    SGLog(@"reset: removed %lu keys", (unsigned long)removed);
+    SGRestartSpotify();
+}
+
+static void confirmReset(void) {
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Reset all settings?"
+                                                                  message:@"Every switch goes off, flag overrides and the tab bar layout are cleared, and Spotify restarts as it came, with the mod doing nothing until asked. Spotify's own settings are untouched."
+                                                           preferredStyle:UIAlertControllerStyleAlert];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Reset and restart" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) { resetAll(); }]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+    [SGTopController() presentViewController:alert animated:YES completion:nil];
+}
+
 // Which build this is, whether the site has a newer one, and where to reach the mod: without these
 // rows a build that is already installed has no way of telling its user that anything moved on.
 SGModSection *SGAboutSection(void) {
+    SGModRow *reset = SGActionRow(@"Reset all settings", @"Every switch off, Spotify as it came, then a restart", ^{ confirmReset(); });
+    reset.color = SGRed();
     NSString *spotify = [NSBundle.mainBundle objectForInfoDictionaryKey:@"CFBundleShortVersionString"] ?: @"unknown";
     return SGSection(@"About", @[
         SGStatRow(@"Version", ^NSString *{ return @(SG_VERSION); }),
@@ -15,5 +42,6 @@ SGModSection *SGAboutSection(void) {
         SGLinkRow(@"Website", @"Downloads, and the source to add to AltStore or SideStore", SGSiteURL),
         SGLinkRow(@"GitHub", @"Source, releases and issues", SGRepoURL),
         SGActionRow(@"Welcome tour", @"The pages from the first launch, again", ^{ SGShowOnboarding(); }),
+        reset,
     ]);
 }

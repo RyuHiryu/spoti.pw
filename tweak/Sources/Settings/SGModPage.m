@@ -219,11 +219,11 @@ static BOOL flagRowOn(SGModRow *row) {
     return value && [value boolValue] != row.forceOff;
 }
 
-// A flag the Spotify's own Liquid Glass switch owns: its row shows what that switch forces and
+// A flag the Liquid Glass UI switch owns: its row shows what that switch forces and
 // takes no touch, so the flag has one place to change. An override from All flags still wins.
 static BOOL flagRowLocked(SGModRow *row) {
     if (!row.flag) return NO;
-    return (SGGlassOwnsFlag(row.key) && SGEnabled(SGKeySpotifyGlass)) || (row.forceOff && SGAdBlockForcesFlagOff(row.key));
+    return (SGGlassOwnsFlag(row.key) && SGFlag(SGKeySpotifyGlass, NO)) || (row.forceOff && SGAdBlockForcesFlagOff(row.key));
 }
 
 @implementation SGModPage {
@@ -369,6 +369,10 @@ static BOOL flagRowLocked(SGModRow *row) {
     SGModRow *row = [self rowAt:[NSIndexPath indexPathForRow:toggle.tag % 1000 inSection:toggle.tag / 1000]];
     if (row.flag) SGSetFlagOverride(row.key, toggle.on ? @(!row.forceOff) : nil);
     else SGSetEnabled(row.key, toggle.on);
+    if (row.changed) {
+        row.changed(toggle.on);
+        [self.tableView reloadData];
+    }
     if (toggle.on && row.warning) [self warn:row];
 }
 

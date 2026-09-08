@@ -18,6 +18,7 @@
 @property (nonatomic, copy) NSString *(^value)(void);
 @property (nonatomic, copy) void (^action)(void);
 @property (nonatomic, copy) NSString *warning;
+@property (nonatomic, copy) void (^changed)(BOOL on);   // after the switch is stored; the page reloads
 @property (nonatomic, strong) UIColor *color;   // title, subtitle and symbol, for a warning row
 @property (nonatomic, copy) NSString *symbol;
 @end

@@ -86,7 +86,7 @@ static void restyleCardContent(UIView *card) {
 }
 
 static void styleNowPlayingBar(UIViewController *container) {
-    if (!SGEnabled(SGKeyNowPlayingBar)) return;
+    if (!SGFlag(SGKeyNowPlayingBar, NO)) return;
     UIViewController *barVC = container.childViewControllers.firstObject;
     UIView *bar = barVC.viewIfLoaded ?: container.view;
     sg_nowPlayingRoot = bar;
@@ -128,7 +128,7 @@ static void styleNowPlayingBar(UIViewController *container) {
 // `stock` gives the bar back to Spotify for the length of an animation, and takes it again after.
 static void barStock(BOOL stock, NSTimeInterval fade) {
     UIView *host = sg_barGlassHost;
-    if (!host || !SGEnabled(SGKeyNowPlayingBar) || sg_nowPlayingStock == stock) return;
+    if (!host || !SGFlag(SGKeyNowPlayingBar, NO) || sg_nowPlayingStock == stock) return;
     sg_nowPlayingStock = stock;
 
     if (stock) {

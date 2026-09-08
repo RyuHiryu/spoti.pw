@@ -51,8 +51,19 @@ static CGColorRef copyBlack(CGColorRef color) {
 }
 %end
 
+// Spotify's settings list paints nothing of its own and shows whatever sits under it, which is not
+// the base grey the hooks above turn black. The list is the top surface, so it takes the black.
+%hook _TtC21Settings_PlatformImpl26SettingsListViewController
+- (void)viewDidLayoutSubviews {
+    %orig;
+    for (UIView *sub in ((UIViewController *)self).view.subviews) {
+        if ([sub isKindOfClass:UICollectionView.class]) sub.backgroundColor = UIColor.blackColor;
+    }
+}
+%end
+
 %ctor {
-    if (SGEnabled(SGKeyAmoled)) {
+    if (SGFlag(SGKeyAmoled, NO)) {
         %init;
     }
 }

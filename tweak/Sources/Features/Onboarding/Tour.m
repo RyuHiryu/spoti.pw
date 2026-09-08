@@ -35,6 +35,7 @@ typedef NS_ENUM(NSInteger, SGTourRowKind) { SGTourRowPlain, SGTourRowSwitch, SGT
 
 @interface SGTourRow : NSObject
 @property (nonatomic, copy) NSString *symbol, *title, *subtitle, *key, *warning;
+@property (nonatomic, copy) void (^changed)(BOOL on);
 @property (nonatomic) SGTourRowKind kind;
 @property (nonatomic) BOOL defaultOn;
 @property (nonatomic, copy) void (^action)(void);
@@ -139,6 +140,7 @@ static SGTourRow *actionRow(NSString *symbol, NSString *title, NSString *subtitl
 
 - (void)toggled {
     SGSetEnabled(_row.key, _toggle.on);
+    if (_row.changed) _row.changed(_toggle.on);
     if (!_toggle.on || !_row.warning) return;
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:_row.title
                                                                    message:_row.warning
@@ -291,6 +293,8 @@ static SGTourRow *actionRow(NSString *symbol, NSString *title, NSString *subtitl
 
 - (NSArray<SGTourPage *> *)buildPages {
     __weak typeof(self) weakSelf = self;
+    SGTourRow *glass = switchRow(@"drop.fill", @"Liquid Glass UI", @"Spotify's own glass bars and sheets, the search field, now playing bar, artwork background and lyrics", SGKeySpotifyGlass, NO);
+    glass.changed = ^(BOOL on) { SGSetLiquidGlassUI(on); };
     SGTourRow *premium = switchRow(@"crown.fill", @"Pretend to be Premium", @"Free accounts only", SGKeyFakePremium, NO);
     premium.warning = SGFakePremiumWarning;
     NSMutableArray *pages = [NSMutableArray array];
@@ -301,9 +305,9 @@ static SGTourRow *actionRow(NSString *symbol, NSString *title, NSString *subtitl
         plainRow(@"dock.rectangle", @"A tab bar you compose", @"Reorder, hide, add any Spotify link"),
         plainRow(@"flag.fill", @"Every flag Spotify ships", @"Searchable, with the features it never released"),
     ]]];
-    [pages addObject:[self pageWithSymbol:@"circle.lefthalf.filled" heading:@"Your look." body:@"Matters of taste. Pick now, change any time in Mod Settings." rows:@[
-        switchRow(@"moon.fill", @"AMOLED background", @"Pure black instead of Spotify's dark grey", SGKeyAmoled, YES),
-        switchRow(@"drop.fill", @"Spotify's own Liquid Glass", @"The glass navigation bar, slider and sheets Spotify shipped switched off", SGKeySpotifyGlass, YES),
+    [pages addObject:[self pageWithSymbol:@"circle.lefthalf.filled" heading:@"Your look." body:@"Everything starts off. Switch on what you like now, change any time in Mod Settings." rows:@[
+        glass,
+        switchRow(@"moon.fill", @"AMOLED background", @"Pure black instead of Spotify's dark grey", SGKeyAmoled, NO),
         switchRow(@"paintpalette.fill", @"Home gradient", @"A wash of colour behind the top of Home", SGKeyHomeGradient, NO),
     ]]];
     [pages addObject:[self pageWithSymbol:@"eye.slash.fill" heading:@"Ads and nags." body:@"From EeveeSpotify. All three are off until switched on, and none is needed on a Premium account." rows:@[
@@ -432,10 +436,9 @@ static UIButton *glassButton(NSString *title, BOOL prominent) {
 // tap on the icon comes up the chosen way.
 - (void)finish {
     SGSetEnabled(SGKeyOnboardingSeen, YES);
-    BOOL restart = self.changed;
-    [NSUserDefaults.standardUserDefaults synchronize];
-    if (restart) {
-        exit(0);
+    if (self.changed) {
+        SGRestartSpotify();
+        return;
     }
     [self dismissViewControllerAnimated:YES completion:^{ SGShowSigningFixIfPending(); }];
 }

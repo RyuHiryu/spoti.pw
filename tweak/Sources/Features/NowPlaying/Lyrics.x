@@ -34,7 +34,7 @@ static UIView *cellAround(UIView *view) {
 %hook _TtC22Lyrics_CardElementImpl8CardView
 - (void)layoutSubviews {
     %orig;
-    if (!SGEnabled(SGKeyLyricsCard)) return;
+    if (!SGFlag(SGKeyLyricsCard, NO)) return;
     UIView *cell = cellAround((UIView *)self);
     // A card Declutter/Declutter.x collapsed reports no height; leave it alone.
     if (!cell || cell.bounds.size.height < 40) return;
@@ -68,12 +68,12 @@ static UIView *clearAncestors(UIView *view) {
 - (void)setBackgroundColor:(UIColor *)color {
     static dispatch_once_t once;
     dispatch_once(&once, ^{ SGLog(@"lyrics page paints itself %@ through UIView", color); });
-    %orig(SGEnabled(SGKeyLyricsCard) ? nil : color);
+    %orig(SGFlag(SGKeyLyricsCard, NO) ? nil : color);
 }
 
 - (void)layoutSubviews {
     %orig;
-    if (!SGEnabled(SGKeyLyricsCard)) return;
+    if (!SGFlag(SGKeyLyricsCard, NO)) return;
     UIView *page = (UIView *)self;
     if (page.bounds.size.height < 200) return;
 

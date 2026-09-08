@@ -25,7 +25,7 @@ BOOL SGGlassOwnsFlag(NSString *key) {
 
 static id forced(NSString *key) {
     id value = SGFlagOverride(key);
-    if (!value && SGEnabled(SGKeySpotifyGlass) && SGGlassOwnsFlag(key)) value = @YES;
+    if (!value && SGFlag(SGKeySpotifyGlass, NO) && SGGlassOwnsFlag(key)) value = @YES;
     if (!value && SGAdBlockForcesFlagOff(key)) value = @NO;
     return value;
 }
@@ -78,7 +78,7 @@ static id enumFor(NSString *key, id orig) {
 
 %hook SPTHubViewController
 - (BOOL)prefersLiquidGlassNavigationBar {
-    return SGEnabled(SGKeySpotifyGlass) ? YES : %orig;
+    return SGFlag(SGKeySpotifyGlass, NO) ? YES : %orig;
 }
 %end
 

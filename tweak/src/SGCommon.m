@@ -227,9 +227,12 @@ BOOL SGLooksLikeCard(UIView *view, CGColorRef color) {
 
 #pragma mark - glass
 
+// +effectWithStyle: is the only initialiser UIGlassEffect has; a bare -init leaves the material
+// unresolved and the pane renders as a plain blur, while the capsule shape, which is the view's
+// own property, still comes out right. Spotify's own Reprise glass builds its effect the same way.
 static UIVisualEffect *glassEffect(void) {
     Class glass = NSClassFromString(@"UIGlassEffect");
-    if (glass) return [[glass alloc] init];
+    if ([glass respondsToSelector:@selector(effectWithStyle:)]) return [glass effectWithStyle:0];
     return [UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemChromeMaterialDark];
 }
 

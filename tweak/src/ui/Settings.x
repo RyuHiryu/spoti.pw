@@ -123,6 +123,7 @@ static BOOL sg_pagesConform;
 @property (nonatomic, copy) UIViewController *(^page)(void);
 @property (nonatomic, copy) NSString *(^value)(void);
 @property (nonatomic, copy) void (^action)(void);
+@property (nonatomic, copy) NSString *warning;
 @end
 
 @implementation SGModRow
@@ -155,6 +156,14 @@ static SGModRow *hideRow(NSString *title, NSString *subtitle, NSString *key) {
 static SGModRow *optionRow(NSString *title, NSString *subtitle, NSString *key) {
     SGModRow *row = switchRow(title, subtitle, key);
     row.defaultOn = NO;
+    return row;
+}
+
+// A switch whose work is not finished: turning it on says so first, and offers the repo to anyone
+// who would rather fix it than live with it.
+static SGModRow *unstableRow(NSString *title, NSString *subtitle, NSString *key, NSString *warning) {
+    SGModRow *row = switchRow(title, subtitle, key);
+    row.warning = warning;
     return row;
 }
 
@@ -409,6 +418,18 @@ static UITableViewCell *dequeue(UITableView *table, NSString *identifier) {
     SGModRow *row = [self rowAt:[NSIndexPath indexPathForRow:toggle.tag % 1000 inSection:toggle.tag / 1000]];
     if (row.flag) SGSetFlagOverride(row.key, toggle.on ? @(!row.forceOff) : nil);
     else SGSetEnabled(row.key, toggle.on);
+    if (toggle.on && row.warning) [self warn:row];
+}
+
+- (void)warn:(SGModRow *)row {
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:[row.title stringByAppendingString:@" is unstable"]
+                                                                  message:row.warning
+                                                           preferredStyle:UIAlertControllerStyleAlert];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Open GitHub" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        SGOpenURL(SGRepoURL);
+    }]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleCancel handler:nil]];
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 @end
@@ -901,7 +922,8 @@ static NSString *const kRestart = @"Changes apply after you restart Spotify.";
 static UIViewController *uiTweaksPage(void) {
     return [[SGModPage alloc] initWithTitle:@"UI Tweaks" intro:kRestart sections:@[
         section(@"Liquid Glass", @[
-            switchRow(@"Tab bar", @"[WIP] Unstable", SGKeyTabBar),
+            unstableRow(@"Tab bar", @"[WIP] Unstable", SGKeyTabBar,
+                        @"The glass capsule does not render the way iOS draws its own, and there is no selection indicator behind the active tab. Switching this on will look wrong.\n\nIf you want to take it further, pull requests are very welcome."),
             switchRow(@"Search field", @"Glass capsule instead of the white field", SGKeySearchField),
             switchRow(@"Spotify's own Liquid Glass", @"The glass navigation bar, the new player slider and the new sheets, all shipped switched off", SGKeySpotifyGlass),
         ]),

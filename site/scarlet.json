@@ -9,7 +9,7 @@
       "version": "0.14.1-9.1.78",
       "bundleID": "com.spotify.client2",
       "down": "https://files.catbox.moe/REPLACE.ipa",
-      "description": "Spotify's own Liquid Glass design, unhidden from its feature flags, plus a pure black AMOLED background, a decluttered player and Home, a tab bar you can reorder or add your own links to, an editor for all of Spotify's internal flags, and telemetry blocking.\n\nPurely cosmetic. It does not unlock Premium.",
+      "description": "Like and dislike back on the lock screen widget, speed control and trim silence for music and not only podcasts, Spotify's own Liquid Glass with every flag of it on at once, a pure black AMOLED background, picture in picture, lyrics translations and vocal removal, a tab bar you reorder or add your own links to, no ad on app open and no upsells or tooltips, telemetry blocking with a count of what it stopped, and an editor for every one of Spotify's internal flags.\n\nPurely cosmetic. It does not unlock Premium.",
       "icon": "https://spoti.pw/icon.png",
       "dev": "vojta"
     }

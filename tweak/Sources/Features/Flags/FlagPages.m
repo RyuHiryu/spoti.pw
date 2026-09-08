@@ -36,35 +36,36 @@ UIViewController *SGPlaybackSettingsPage(void) {
     ] footer:nil];
 }
 
-// Every switch here forces a flag Spotify ships on to off, so the switch off is Spotify's own value.
+// Every switch here forces a flag Spotify ships on to off, so the titles name the blocking: on
+// stops the thing, off is Spotify's own value.
 UIViewController *SGAdsSettingsPage(void) {
     return [[SGModPage alloc] initWithTitle:@"Ads & nags" intro:SGRestartNote sections:@[
         SGSection(nil, @[
             SGPageRow(@"Ad blocking", ^UIViewController *{ return SGAdBlockSettingsPage(); }),
         ]),
         SGSection(@"Ads", @[
-            SGKillRow(@"Ad when the app opens", @"ios-feature-adonappopen.enabled"),
-            SGKillRow(@"Its CTA card", @"ios-feature-adonappopen.cta_card_enabled"),
+            SGKillRow(@"Block the ad when the app opens", @"ios-feature-adonappopen.enabled"),
+            SGKillRow(@"Block its CTA card", @"ios-feature-adonappopen.cta_card_enabled"),
         ]),
         SGSection(@"Upsells", @[
-            SGKillRow(@"Shuffle toggle upsell", @"ios-feature-shuffletoggleupsell.is_enabled_pt2"),
-            SGKillRow(@"Shuffle upsell in the video player", @"ios-feature-nowplaying-modes.video_first_shuffle_upsell_enabled"),
+            SGKillRow(@"Hide the shuffle toggle upsell", @"ios-feature-shuffletoggleupsell.is_enabled_pt2"),
+            SGKillRow(@"Hide the shuffle upsell in the video player", @"ios-feature-nowplaying-modes.video_first_shuffle_upsell_enabled"),
         ]),
         SGSection(@"Badges", @[
-            SGKillRow(@"DJ beta badge", @"ios-home-evopage-impl.dj_mdc_beta_badge_enabled"),
-            SGKillRow(@"DJ button on Home", @"ios-home-evopage-impl.idj_show_dj_button"),
+            SGKillRow(@"Hide the DJ beta badge", @"ios-home-evopage-impl.dj_mdc_beta_badge_enabled"),
+            SGKillRow(@"Hide the DJ button on Home", @"ios-home-evopage-impl.idj_show_dj_button"),
         ]),
         SGSection(@"Tooltips", @[
-            SGKillRow(@"Data saver", @"ios-feature-nowplayingbar.data_saver_tooltip"),
-            SGKillRow(@"Smart shuffle helper", @"ios-messaging-reduceinterventions-impl.enable_message_smart_shuffle_helper_tooltip"),
-            SGKillRow(@"Watch feed explorer", @"ios-messaging-reduceinterventions-impl.enable_message_watch_feed_entity_explorer_tooltip"),
-            SGKillRow(@"AI playlist creation", @"ios-messaging-reduceinterventions-impl.enable_message_your_library_ai_playlist_creation_tooltip"),
-            SGKillRow(@"Account switching", @"ios-messaging-reduceinterventions-impl.enable_message_account_switching_tooltip"),
-            SGKillRow(@"Concert notifications", @"ios-messaging-reduceinterventions-impl.enable_message_live_events_concert_notifications_tooltip"),
-            SGKillRow(@"Live event", @"ios-messaging-reduceinterventions-impl.enable_message_live_events_event_entity_safe_tooltip"),
-            SGKillRow(@"Live event venue", @"ios-messaging-reduceinterventions-impl.enable_message_live_events_event_entity_venuename_header_tooltip"),
-            SGKillRow(@"Player suggestions upsell", @"ios-messaging-reduceinterventions-impl.enable_message_reinvent_free_n_p_v_suggestions_upsell"),
-            SGKillRow(@"Puffin nudge", @"ios-messaging-reduceinterventions-impl.enable_message_puffin_nudge_end_optimization"),
+            SGKillRow(@"Hide the data saver tip", @"ios-feature-nowplayingbar.data_saver_tooltip"),
+            SGKillRow(@"Hide the smart shuffle helper", @"ios-messaging-reduceinterventions-impl.enable_message_smart_shuffle_helper_tooltip"),
+            SGKillRow(@"Hide the watch feed explorer tip", @"ios-messaging-reduceinterventions-impl.enable_message_watch_feed_entity_explorer_tooltip"),
+            SGKillRow(@"Hide the AI playlist creation tip", @"ios-messaging-reduceinterventions-impl.enable_message_your_library_ai_playlist_creation_tooltip"),
+            SGKillRow(@"Hide the account switching tip", @"ios-messaging-reduceinterventions-impl.enable_message_account_switching_tooltip"),
+            SGKillRow(@"Hide the concert notifications tip", @"ios-messaging-reduceinterventions-impl.enable_message_live_events_concert_notifications_tooltip"),
+            SGKillRow(@"Hide the live event tip", @"ios-messaging-reduceinterventions-impl.enable_message_live_events_event_entity_safe_tooltip"),
+            SGKillRow(@"Hide the live event venue tip", @"ios-messaging-reduceinterventions-impl.enable_message_live_events_event_entity_venuename_header_tooltip"),
+            SGKillRow(@"Hide the player suggestions upsell", @"ios-messaging-reduceinterventions-impl.enable_message_reinvent_free_n_p_v_suggestions_upsell"),
+            SGKillRow(@"Hide the Puffin nudge", @"ios-messaging-reduceinterventions-impl.enable_message_puffin_nudge_end_optimization"),
         ]),
         SGSection(nil, @[
             SGFlagRow(@"Reduce interventions", @"ios-messaging-reduceinterventions-impl.enabled"),

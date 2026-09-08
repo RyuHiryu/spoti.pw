@@ -373,13 +373,19 @@ static SGTourRow *actionRow(NSString *symbol, NSString *title, NSString *subtitl
 
 static UIButton *glassButton(NSString *title, BOOL prominent) {
     UIButtonConfiguration *config;
-    if (prominent && [UIButtonConfiguration respondsToSelector:@selector(prominentGlassButtonConfiguration)]) {
-        config = [UIButtonConfiguration prominentGlassButtonConfiguration];
-    } else if (!prominent && [UIButtonConfiguration respondsToSelector:@selector(glassButtonConfiguration)]) {
-        config = [UIButtonConfiguration glassButtonConfiguration];
+
+    if (@available(iOS 26.0, *)) {
+        if (prominent && [UIButtonConfiguration respondsToSelector:@selector(prominentGlassButtonConfiguration)]) {
+            config = [UIButtonConfiguration prominentGlassButtonConfiguration];
+        } else if (!prominent && [UIButtonConfiguration respondsToSelector:@selector(glassButtonConfiguration)]) {
+            config = [UIButtonConfiguration glassButtonConfiguration];
+        } else {
+            config = prominent ? [UIButtonConfiguration filledButtonConfiguration] : [UIButtonConfiguration grayButtonConfiguration];
+        }
     } else {
         config = prominent ? [UIButtonConfiguration filledButtonConfiguration] : [UIButtonConfiguration grayButtonConfiguration];
     }
+
     config.cornerStyle = UIButtonConfigurationCornerStyleCapsule;
     config.baseBackgroundColor = prominent ? SGGreen() : nil;
     config.baseForegroundColor = prominent ? UIColor.blackColor : UIColor.whiteColor;

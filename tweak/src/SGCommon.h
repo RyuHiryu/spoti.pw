@@ -5,6 +5,7 @@
 
 // iOS 26 API, absent from the SDK Theos builds against. Resolved at runtime.
 @interface UIGlassEffect : UIVisualEffect
++ (instancetype)effectWithStyle:(NSInteger)style;
 @property (nonatomic, copy) UIColor *tintColor;
 @property (nonatomic, getter=isInteractive) BOOL interactive;
 @end

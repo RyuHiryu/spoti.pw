@@ -27,6 +27,16 @@ installs next to the real Spotify rather than over it (`BUNDLE_ID=` overrides).
 The first build spends about a minute reading Spotify's remote-config flags out of your IPA into
 `tweak/src/SGFlagList.m`. Later builds reuse it; `make flags` regenerates it.
 
+## Build on GitHub instead
+
+No Mac needed. Fork this repo, enable Actions in the fork, and run the **Build IPA from your own
+Spotify IPA** workflow. It asks for a direct link to your decrypted Spotify `.ipa` (filebin.net,
+Dropbox, a file host of your own), builds the tweak, injects it, and hands back an unsigned
+`Spotify-<version>-glass.ipa` as a workflow artifact, or on filebin.net if you pick that. Sign it
+with SideStore, Feather or any certificate signer.
+
+The IPA link is masked in the run's log, and the result lives only in your fork.
+
 ## More
 
 [docs/tweaks.md](docs/tweaks.md) — every settings page, the other make targets, and how to add a

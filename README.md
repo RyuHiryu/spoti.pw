@@ -86,7 +86,7 @@ Put the decrypted `.ipa` in `ipa/`, then:
 `.signing.env.example` and fill it in. `BUNDLE_ID=` overrides the bundle id.
 
 The first build spends about a minute reading Spotify's remote-config flags out of your IPA into
-`tweak/src/SGFlagList.m`, so the flag list always matches the Spotify you built from. Later builds
+`tweak/Sources/Features/Flags/SGFlagList.m`, so the flag list always matches the Spotify you built from. Later builds
 reuse it; `make flags` regenerates it.
 
 ## Mod Settings

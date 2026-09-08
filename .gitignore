@@ -12,4 +12,4 @@ trees/*.txt
 tweak/.theos/
 tweak/obj/
 tweak/packages/
-tweak/src/SGFlagList.m
+tweak/Sources/Features/Flags/SGFlagList.m

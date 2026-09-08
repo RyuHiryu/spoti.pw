@@ -46,7 +46,7 @@ OUT="${OUT:-$ROOT/out/Spotify-$VERSION-glass.ipa}"
 echo "==> Spotify $VERSION -> $OUT"
 
 # The flag table is generated rather than committed, so it always matches the IPA being built.
-if [ ! -f "$ROOT/tweak/src/SGFlagList.m" ]; then
+if [ ! -f "$ROOT/tweak/Sources/Features/Flags/SGFlagList.m" ]; then
   echo "==> extracting the flag table (once, about 40 s)"
   "$ROOT/scripts/extract-flags.py" "$IN"
 fi

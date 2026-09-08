@@ -2,16 +2,49 @@
 
 ## Layout
 
-    tweak/src/ui/*.x   the tweaks: NowPlayingBar, TabBar, Navbar, NowPlayingView, Lyrics, SearchField, Flags, Amoled, HomeGradient, Declutter, Playlist, Repaint, Settings
-    tweak/src/SG*      shared helpers (glass panes, view walking, logging, screen dumps) and SGPrivacy, the telemetry blocking
-    scripts/           pipeline.sh (build + inject), install.sh (sign + install), record-trees.py, dump-log.sh, extract-flags.py
-    trees/             recorded view trees, one per screen; the input for every new tweak
-    plist/             Info.plist overrides merged into the app (turns UIDesignRequiresCompatibility off)
-    vendor/            AutoFLEX deb
-    ipa/, out/         decrypted Spotify IPA in, built IPAs out (both gitignored)
+    tweak/                      the Theos project: Makefile, control, the bundle filter plist
+    tweak/Sources/Core/         what every file builds on: logging, preferences, view-tree walking, glass panes,
+                                runtime declarations of iOS 26 API (SGCore.h imports all of it)
+    tweak/Sources/Headers/      reverse-engineered Spotify classes, one header each, only the selectors used
+    tweak/Sources/Settings/     the Mod Settings framework: SGPage (a page on Spotify's stack), SGModPage (sections
+                                of rows), SGPageStyle (Spotify's list look), SGModSettings.x (the root page and
+                                the row that opens it from Spotify's settings)
+    tweak/Sources/Features/     one directory per feature, see below
+    tweak/Sources/Diagnostics/  screen dumps and the tree server of FLEX builds
+    scripts/                    pipeline.sh (build + inject), install.sh (sign + install), record-trees.py,
+                                dump-log.sh, extract-flags.py, make-manifests.py
+    trees/                      recorded view trees, one per screen; the input for every new hook
+    plist/                      Info.plist overrides merged into the app (turns UIDesignRequiresCompatibility off)
+    site/                       the manifests spoti.pw serves (version.json, AltStore and Scarlet sources)
+    vendor/                     AutoFLEX deb
+    ipa/, out/                  decrypted Spotify IPA in, built IPAs out (both gitignored)
 
-`tweak/src/SGFlagList.m` is generated from the IPA and gitignored, as are the recorded trees: both
-are read out of Spotify's own binary and belong to whoever built them.
+`tweak/Sources/Features/Flags/SGFlagList.m` is generated from the IPA and gitignored, as are the
+recorded trees: both are read out of Spotify's own binary and belong to whoever built them.
+
+## Features
+
+A feature is a directory under `tweak/Sources/Features/` holding everything about one area of the
+app:
+
+    <Feature>.h            the keys of its switches, and the functions other files may call
+    <Something>.x          the hooks, one file per screen or mechanism, each ending in its own %ctor
+    <Feature>Settings.m    its Mod Settings page, built from the rows in Settings/SGModPage.h
+    <Model>.m              plain Objective-C the hooks and the page share, where there is any
+
+    NowPlaying/   the glass bar (NowPlayingBar.x), the full screen player (Player.x), the lyrics card and page (Lyrics.x)
+    Navbar/       the glass tab bar (TabBar.x) and its composition (Navbar.x, NavbarLayout.m), the Navbar and Add a tab pages
+    Home/         the Home gradient
+    Playlist/     the playlist header and pills, hidden one switch each
+    Declutter/    cards under the player and sections of Home collapsed, player buttons hidden; rows on the Now Playing and Home pages
+    Appearance/   AMOLED (Amoled.x), the glass search field (SearchField.x), and Repaint.x, which keeps stripped areas transparent
+    Flags/        Spotify's remote-config flags: the provider hook, the generated table, the All flags page and the topic pages
+    Privacy/      telemetry blocking and its counters
+    About/        the update check and the About section of the root page
+
+A hook reads its switch when it runs (`SGEnabled`, `SGHidden`, `SGFlag` from Core/SGPrefs.h), so a
+change shows after Spotify restarts; Navbar is the exception and applies as soon as the bar lays
+out again. The root page in `Settings/SGModSettings.x` lists every feature's page by hand.
 
 ## Make targets
 
@@ -21,7 +54,7 @@ are read out of Spotify's own binary and belong to whoever built them.
     make install FLEX=1   # the same with FLEX, which is what make trees reads through
     make trees      # record view trees screen by screen (FLEX build open on the phone, USB)
     make log        # stream [spotifyglass] log lines from the phone
-    make flags      # regenerate tweak/src/SGFlagList.m from the IPA
+    make flags      # regenerate the flag table from the IPA
 
 ## Mod Settings
 
@@ -41,7 +74,7 @@ its newer design behind several flags at once, so UI Tweaks > Spotify's own Liqu
 (the glass navigation bar, the new player slider, the sheet style player, the queue and Connect
 sheets, the redesigned player header, the sleep timer's options sheet): while it is on it forces
 each of them, and their rows elsewhere show what it forces and take no touch, so the group has one
-switch. `SGGlassOwnsFlag` in SGCommon.m holds the list. A change shows after Spotify restarts.
+switch. `SGGlassOwnsFlag` in Features/Flags/Flags.x holds the list. A change shows after Spotify restarts.
 
 Navbar is the exception and applies as soon as the bar lays out again. It lists the tabs in the order
 the bar shows them: drag to reorder, tap to hide or show, and Add a tab puts a page of Spotify's or
@@ -50,10 +83,18 @@ name under their icon, so they can be hidden but never removed, and switching th
 starts the order over. A tab of the mod's own opens its link through Spotify's link dispatcher, so it
 never lights up as the tab you are on.
 
-## Adding a tweak
+## Adding a feature
 
 1. `make trees`, record the screen, read `trees/<screen>.txt` for the classes and frames.
-2. Add `tweak/src/ui/<Area>.x`: hook the classes, use `SGGlassFor`/`SGGlassAt` + `SGShapeGlass` for
-   glass, `SGStripBackgrounds` to clear Spotify's paint, and end with `%ctor { %init; SGRequireClasses(...); }`.
-3. `make install`. Log lines are prefixed `[spotifyglass]`. A FLEX build serves the visible screen's
+2. Make `tweak/Sources/Features/<Feature>/` with `<Feature>.h` declaring the switch key
+   (`#define SGKey<Feature> @"spotifyglass.<feature>"`) and `UIViewController *SG<Feature>SettingsPage(void)`.
+3. Add the hooks in `<Screen>.x`: `#import "Core/SGCore.h"` and the feature header, guard on the
+   switch, use `SGGlassFor`/`SGGlassAt` + `SGShapeGlass` for glass and `SGStripBackgrounds` to clear
+   Spotify's paint, and end with `%ctor { %init; SGRequireClasses(@[...]); }`.
+4. Add `<Feature>Settings.m` returning an `SGModPage` of `SGSection`s of `SGSwitchRow`/`SGHideRow`/
+   `SGFlagRow` (Settings/SGModPage.h), and list it in `Settings/SGModSettings.x`.
+5. `make install`. Log lines are prefixed `[spotifyglass]`. A FLEX build serves the visible screen's
    tree on the phone's port 8085, which `make trees` reaches over USB through iproxy.
+
+A class Spotify has renamed shows up in the log as `class X not found, its hooks are inactive`;
+declare the classes a feature needs in `Headers/` only when a hook calls into them by type.

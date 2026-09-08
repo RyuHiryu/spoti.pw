@@ -18,5 +18,5 @@ trees:    ## record per-screen view trees into trees/ (needs a FLEX build on the
 	./scripts/record-trees.py
 log:      ## stream the tweak's log lines from the phone
 	./scripts/dump-log.sh
-flags:    ## regenerate tweak/src/SGFlagList.m, Spotify's remote-config flags, from the IPA
+flags:    ## regenerate tweak/Sources/Features/Flags/SGFlagList.m, Spotify's remote-config flags, from the IPA
 	./scripts/extract-flags.py $(IPA)

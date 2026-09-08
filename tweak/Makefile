@@ -1,4 +1,4 @@
-TARGET := iphone:clang:16.5:16.0
+TARGET := iphone:clang:latest:16.0
 ARCHS := arm64
 FINALPACKAGE := 1
 
@@ -8,8 +8,10 @@ TWEAK_NAME := spotifyglass
 
 SG_VERSION := $(shell sed -n 's/^Version: //p' control)
 
-spotifyglass_FILES := $(wildcard src/*.m) $(wildcard src/*.x) $(wildcard src/ui/*.x)
-spotifyglass_CFLAGS := -fobjc-arc -Isrc -DSG_VERSION=\"$(SG_VERSION)\"
+# Every source under Sources/, so a new feature needs no Makefile edit. Features/Flags/SGFlagList.m
+# is generated from the IPA by scripts/extract-flags.py.
+spotifyglass_FILES := $(shell find Sources -name '*.m' -o -name '*.x' | sort)
+spotifyglass_CFLAGS := -fobjc-arc -ISources -DSG_VERSION=\"$(SG_VERSION)\"
 spotifyglass_FRAMEWORKS := UIKit QuartzCore
 # Runtime swizzling instead of Substrate so the dylib has no extra dependency inside the IPA.
 spotifyglass_LOGOS_DEFAULT_GENERATOR := internal

@@ -25,6 +25,8 @@ UIViewController *SGAppearanceSettingsPage(void) {
         ]),
         SGSection(@"Theme", @[
             SGOptionRow(@"AMOLED background", @"Pure black instead of Spotify's dark grey", SGKeyAmoled),
+            SGStatActionRow(@"Accent colour", @"In place of Spotify's green, everywhere it is drawn; tap to pick", ^NSString *{ return SGAccentLabel(); }, ^{ SGPickAccent(); }),
+            SGActionRow(@"Spotify's green", @"Back to the colour the app came with", ^{ SGSetInt(SGKeyAccent, -1); }),
         ]),
     ] footer:nil];
 }

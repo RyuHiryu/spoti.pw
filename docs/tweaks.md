@@ -36,7 +36,7 @@ app:
     Home/         the Home gradient
     Playlist/     the playlist header and pills, hidden one switch each
     Declutter/    cards under the player and sections of Home collapsed, player buttons hidden; rows on the Now Playing and Home pages
-    Appearance/   AMOLED (Amoled.x), the glass search field (SearchField.x), and Repaint.x, which keeps stripped areas transparent
+    Appearance/   AMOLED (Amoled.x), the glass search field (SearchField.x), the accent colour (Accent.x), and Repaint.x, which keeps stripped areas transparent
     Flags/        Spotify's remote-config flags: the provider hook, the generated table, the All flags page and the topic pages
     Privacy/      telemetry blocking and its counters
     AdBlock/      EeveeSpotify's ad blocking: the ad and upsell services silenced (AdServices.x), ad components out of the

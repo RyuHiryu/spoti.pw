@@ -245,6 +245,15 @@ void SGComposeTabBar(UIView *tabBar) {
     }
 }
 
+// Spotify placed the icon and the label for the width it measured (trees/test5.txt: x 28 in a
+// 134pt slot, the centre of the 80pt it had with five tabs) and lays the item out no further
+// once the slot changes. Assigning the centres back sends them through the hooks below.
+static void centreContents(UIView *item) {
+    SGForEachView(item, ^(UIView *v) {
+        if ([v isKindOfClass:%c(SPTEncoreIconView)] || [v isKindOfClass:%c(SPTEncoreLabel)]) v.center = v.center;
+    });
+}
+
 // Equal slots across the bar, in the order composed above. The frames go on after the stack's
 // own pass, so Spotify's own widths never decide whether a fifth item fits.
 static void placeRow(UIStackView *stack) {
@@ -258,6 +267,7 @@ static void placeRow(UIStackView *stack) {
         CGRect frame = CGRectMake(x, 0, width, height);
         if (!CGAffineTransformIsIdentity(item.transform)) item.transform = CGAffineTransformIdentity;
         if (!CGRectEqualToRect(item.frame, frame)) item.frame = frame;
+        centreContents(item);
     }];
 }
 

@@ -24,7 +24,7 @@
 <p align="center">
   <img src="docs/screenshots/now-playing.webp" width="19%" alt="Full screen player">
   <img src="docs/screenshots/queue.webp" width="19%" alt="Queue as a bottom sheet">
-  <img src="docs/screenshots/home.webp" width="19%" alt="Home in AMOLED black">
+  <img src="docs/screenshots/home.webp" width="19%" alt="Home with the gradient">
   <img src="docs/screenshots/navbar.webp" width="19%" alt="Navbar editor">
   <img src="docs/screenshots/settings.webp" width="19%" alt="Mod Settings">
 </p>

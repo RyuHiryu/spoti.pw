@@ -1,7 +1,7 @@
 #import "Settings/SGModPage.h"
 #import "Privacy.h"
 
-UIViewController *SGPrivacySettingsPage(void) {
+NSArray<SGModSection *> *SGPrivacySections(void) {
     NSMutableArray<SGModRow *> *counts = [NSMutableArray array];
     for (NSString *label in SGBlockedLabels()) {
         [counts addObject:SGStatRow(label, ^NSString *{
@@ -11,13 +11,13 @@ UIViewController *SGPrivacySettingsPage(void) {
     [counts addObject:SGStatRow(@"Total", ^NSString *{
         return @(SGBlockedCount(nil)).stringValue;
     })];
-    return [[SGModPage alloc] initWithTitle:@"Privacy" intro:SGRestartNote sections:@[
+    return @[
         SGSection(@"Telemetry", @[
             SGSwitchRow(@"Block telemetry", @"Answer the analytics endpoints with an empty reply instead of letting the request out", SGKeyBlockTelemetry),
         ]),
-        SGSection(@"Blocked so far", counts),
+        SGSection(@"Telemetry blocked so far", counts),
         SGSection(nil, @[
-            SGActionRow(@"Reset the counters", @"Start counting from zero", ^{ SGResetBlocked(); }),
+            SGActionRow(@"Reset the telemetry counters", @"Start counting from zero", ^{ SGResetBlocked(); }),
         ]),
-    ] footer:nil];
+    ];
 }

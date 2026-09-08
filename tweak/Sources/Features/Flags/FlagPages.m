@@ -2,27 +2,26 @@
 #import "Settings/SGModPage.h"
 #import "Flags.h"
 #import "Features/AdBlock/AdBlock.h"
+#import "Features/Privacy/Privacy.h"
 
-UIViewController *SGLockScreenSettingsPage(void) {
-    return [[SGModPage alloc] initWithTitle:@"Lock screen widget" intro:SGRestartNote sections:@[
-        SGSection(@"Spotify's flags", @[
-            SGFlagRow(@"Like and dislike buttons", @"ios-feature-lockscreen.like_dislike_enabled"),
-            SGFlagRow(@"Animated artwork", @"ios-feature-lockscreen.animated_artwork_enabled"),
-            SGFlagRow(@"Video artwork", @"ios-feature-lockscreen.vit_artwork_enabled"),
-            SGFlagRow(@"Companion content", @"ios-feature-lockscreen.companion_content_enabled"),
-            SGFlagRow(@"Burst skip", @"ios-feature-lockscreen.burst_skip_enabled"),
-            SGFlagRow(@"Chapter skip controls", @"ios-feature-lockscreen.enable_chapter_skip_controls"),
-            SGFlagRow(@"Skip button on podcasts", @"ios-feature-lockscreen.skip_button_on_podcasts"),
-        ]),
-    ] footer:nil];
+SGModSection *SGLockScreenSection(void) {
+    return SGSection(@"Lock screen widget", @[
+        SGFlagRow(@"Like and dislike buttons", @"ios-feature-lockscreen.like_dislike_enabled"),
+        SGFlagRow(@"Animated artwork", @"ios-feature-lockscreen.animated_artwork_enabled"),
+        SGFlagRow(@"Video artwork", @"ios-feature-lockscreen.vit_artwork_enabled"),
+        SGFlagRow(@"Companion content", @"ios-feature-lockscreen.companion_content_enabled"),
+        SGFlagRow(@"Burst skip", @"ios-feature-lockscreen.burst_skip_enabled"),
+        SGFlagRow(@"Chapter skip controls", @"ios-feature-lockscreen.enable_chapter_skip_controls"),
+        SGFlagRow(@"Skip button on podcasts", @"ios-feature-lockscreen.skip_button_on_podcasts"),
+    ]);
 }
 
-UIViewController *SGPlaybackSettingsPage(void) {
-    return [[SGModPage alloc] initWithTitle:@"Playback" intro:SGRestartNote sections:@[
+NSArray<SGModSection *> *SGPlaybackSections(void) {
+    return @[
         SGSection(@"Queue", @[
             SGFlagRow(@"Play next in the context menu", @"ios-feature-queue.is_play_next_context_menu_enabled"),
         ]),
-        SGSection(@"Player", @[
+        SGSection(@"Controls", @[
             SGFlagRow(@"New progress slider", @"ios-feature-encoreexperiments.new_npv_slider_enabled"),
             SGFlagRow(@"Connect as a bottom sheet", @"ios-feature-nowplaying-elements.enable_connect_bottom_sheet"),
             SGFlagRow(@"Connect sheet from the video switcher", @"ios-playbackcontrol-audiovideoswitcher-impl.enable_connect_bottom_sheet"),
@@ -33,13 +32,13 @@ UIViewController *SGPlaybackSettingsPage(void) {
             SGFlagRow(@"Queue badge", @"ios-feature-nowplayingbar.queue_badge"),
             SGFlagRow(@"Two lines of track info", @"ios-feature-nowplayingbar.two_lines_information_unit"),
         ]),
-    ] footer:nil];
+    ];
 }
 
-// Every switch here forces a flag Spotify ships on to off, so the titles name the blocking: on
-// stops the thing, off is Spotify's own value.
+// Every flag switch here forces a flag Spotify ships on to off, so the titles name the blocking: on
+// stops the thing, off is Spotify's own value. The telemetry sections come from Privacy.
 UIViewController *SGAdsSettingsPage(void) {
-    return [[SGModPage alloc] initWithTitle:@"Ads & nags" intro:SGRestartNote sections:@[
+    NSMutableArray<SGModSection *> *sections = [NSMutableArray arrayWithArray:@[
         SGSection(nil, @[
             SGPageRow(@"Ad blocking", ^UIViewController *{ return SGAdBlockSettingsPage(); }),
         ]),
@@ -70,29 +69,10 @@ UIViewController *SGAdsSettingsPage(void) {
         SGSection(nil, @[
             SGFlagRow(@"Reduce interventions", @"ios-messaging-reduceinterventions-impl.enabled"),
         ]),
-    ] footer:@"The tooltip switches belong to Spotify's own intervention-reduction system, which the last switch turns on."];
-}
-
-UIViewController *SGUnreleasedSettingsPage(void) {
-    return [[SGModPage alloc] initWithTitle:@"Unreleased" intro:SGRestartNote sections:@[
-        SGSection(@"Player", @[
-            SGFlagRow(@"Snake on the cover art", @"ios-feature-cover-art-snake.enabled"),
-        ]),
-        SGSection(@"Podcast comments", @[
-            SGFlagRow(@"Comments card", @"ios-feature-comments.enable_comments_card"),
-            SGFlagRow(@"Pinned comments", @"ios-feature-comments.enable_pinned_comments"),
-            SGFlagRow(@"Several reactions", @"ios-feature-comments.enable_multi_reactions"),
-        ]),
-        SGSection(@"Sleep timer", @[
-            SGFlagRow(@"Fade out", @"ios-feature-sleeptimer.enable_fade_out"),
-            SGFlagRow(@"One minute option", @"ios-feature-sleeptimer.enable_one_minute_option"),
-            SGFlagRow(@"Options sheet", @"ios-feature-sleeptimer.use_options_sheet"),
-        ]),
-        SGSection(@"Elsewhere", @[
-            SGFlagRow(@"Local files from the Files app", @"ios-feature-localfiles.documents_enabled"),
-            SGFlagRow(@"Progress bar in the home screen widget", @"ios-widgets-widgetremoteconfig-impl.progress_bar_enabled"),
-        ]),
-    ] footer:nil];
+    ]];
+    [sections addObjectsFromArray:SGPrivacySections()];
+    return [[SGModPage alloc] initWithTitle:@"Ads & privacy" intro:SGRestartNote sections:sections
+                                     footer:@"The tooltip switches belong to Spotify's own intervention-reduction system, which Reduce interventions turns on."];
 }
 
 static UIViewController *martiniPage(void) {
@@ -115,8 +95,26 @@ static UIViewController *martiniPage(void) {
     ] footer:nil];
 }
 
-UIViewController *SGExperimentalSettingsPage(void) {
-    return [[SGModPage alloc] initWithTitle:@"Experimental" intro:nil sections:@[
+// Features Spotify built and did not ship, and the AI chat behind more flags than fit here.
+UIViewController *SGLabsPage(void) {
+    return [[SGModPage alloc] initWithTitle:@"Labs" intro:SGRestartNote sections:@[
+        SGSection(@"Player", @[
+            SGFlagRow(@"Snake on the cover art", @"ios-feature-cover-art-snake.enabled"),
+        ]),
+        SGSection(@"Podcast comments", @[
+            SGFlagRow(@"Comments card", @"ios-feature-comments.enable_comments_card"),
+            SGFlagRow(@"Pinned comments", @"ios-feature-comments.enable_pinned_comments"),
+            SGFlagRow(@"Several reactions", @"ios-feature-comments.enable_multi_reactions"),
+        ]),
+        SGSection(@"Sleep timer", @[
+            SGFlagRow(@"Fade out", @"ios-feature-sleeptimer.enable_fade_out"),
+            SGFlagRow(@"One minute option", @"ios-feature-sleeptimer.enable_one_minute_option"),
+            SGFlagRow(@"Options sheet", @"ios-feature-sleeptimer.use_options_sheet"),
+        ]),
+        SGSection(@"Elsewhere", @[
+            SGFlagRow(@"Local files from the Files app", @"ios-feature-localfiles.documents_enabled"),
+            SGFlagRow(@"Progress bar in the home screen widget", @"ios-widgets-widgetremoteconfig-impl.progress_bar_enabled"),
+        ]),
         SGSection(nil, @[
             SGPageRow(@"AI Chat (Martini)", ^UIViewController *{ return martiniPage(); }),
         ]),

@@ -42,11 +42,11 @@ app:
     AdBlock/      EeveeSpotify's ad blocking: the ad and upsell services silenced (AdServices.x), ad components out of the
                   Hub JSON (AdHubs.x) and the feeds (Feeds.m), Premium pop-ups dropped (AdPopups.x), and the responses
                   rewritten on the way in (AdNetwork.x, Premium.m over the protobuf walker in Protobuf.m)
-    Onboarding/   the welcome tour over Home on the first launch (Onboarding.x, the pages in Tour.m), offered again from About
-    About/        the update check and the About section of the root page
+    Onboarding/   the welcome tour over Home on the first launch (Onboarding.x, the pages in Tour.m), offered again from the Mod page
+    About/        the update check and the Mod page: the build, its updates, the links and the reset
 
-Every key a feature stores starts with `spotifyglass.`, whatever it holds: Reset all settings in
-About removes by that prefix and has no list to keep up to date. It leaves `SGKeyStock` behind,
+Every key a feature stores starts with `spotifyglass.`, whatever it holds: Reset all settings on
+the Mod page removes by that prefix and has no list to keep up to date. It leaves `SGKeyStock` behind,
 which makes every unset switch read off, so a reset is stock Spotify whatever switches exist.
 
 A hook reads its switch when it runs (`SGEnabled`, `SGHidden`, `SGFlag` from Core/SGPrefs.h), so a
@@ -65,26 +65,28 @@ out again, as are the Home gradient's colour, strength and height, but not the s
 
 ## Mod Settings
 
-Settings → Mod Settings lists its pages without a description each, so the list reads as a list: UI
-Tweaks (tab bar, search field, Spotify's own glass, AMOLED), Home & Library (a Gradient page: the wash behind the top of
-Home in one of eight colours, at three strengths and four heights; then hide sections of the Home
-tab and Spotify's home and library flags), Playlist (hide the cover, the
-header's text and buttons, the curation pills), Now Playing (glass, Spotify's player flags, hide
-buttons and cards of the full screen player, and a Lyrics page under it), Lock screen widget,
-Playback (speed, queue, the player and the now playing bar), Ads & nags (every switch forces a flag
-Spotify ships on to off: the ad on app open, upsells, tooltips, the DJ badge; and an Ad blocking page
-under it, EeveeSpotify's layers behind three switches that start off: hide ads, hide upsells and
-pretend to be Premium, with a count of what each stopped), Unreleased (features
-Spotify built and did not ship) and Experimental, which holds AI Chat (Martini). Then Privacy,
-telemetry blocking with a count of what it has stopped; Navbar, the tab bar's own composition; and
-All flags, Spotify's remote-config flags with a search field and an Auto / Off / On control per flag
-(a text field for the number and text ones). A flag switch on a page forces that one flag and off
-leaves Spotify's own value, so the All flags page is where a flag goes back to Auto. Spotify ships
-its newer design behind several flags at once, so UI Tweaks > Spotify's own Liquid Glass owns them
-(the glass navigation bar, the new player slider, the sheet style player, the queue and Connect
-sheets, the redesigned player header, the sleep timer's options sheet): while it is on it forces
-each of them, and their rows elsewhere show what it forces and take no touch, so the group has one
-switch. `SGGlassOwnsFlag` in Features/Flags/Flags.x holds the list. A change shows after Spotify restarts.
+Settings → Mod Settings is three cards of pages, an icon and no description each, so the list
+reads as a list. Appearance (Navbar, the tab bar's own composition, as a page under it; then the
+glass tab bar, search field and Spotify's own glass, AMOLED and the accent colour), Home & Library
+(a Gradient page: the wash behind the top of Home in one of eight colours, at three strengths and
+four heights; then hide sections of the Home tab and Spotify's home and library flags), Playlist
+(hide the cover, the header's text and buttons, the curation pills) and Player (glass, Spotify's
+player flags, hide buttons and cards of the full screen player, then the queue, controls and now
+playing bar flags, the lock screen widget's, and a Lyrics page under it). Ads & privacy (every flag
+switch forces a flag Spotify ships on to off: the ad on app open, upsells, tooltips, the DJ badge;
+an Ad blocking page under it, EeveeSpotify's layers behind three switches that start off: hide ads,
+hide upsells and pretend to be Premium, with a count of what each stopped; then telemetry blocking
+with a count of what it has stopped) and Labs (features Spotify built and did not ship, and AI Chat
+(Martini) under it). Then All flags, Spotify's remote-config flags with a search field and an
+Auto / Off / On control per flag (a text field for the number and text ones), and Mod: the build
+and Spotify's version, the update check, the site and the repo, the welcome tour again and Reset
+all settings. A flag switch on a page forces that one flag and off leaves Spotify's own value, so
+the All flags page is where a flag goes back to Auto. Spotify ships its newer design behind several
+flags at once, so Appearance > Liquid Glass UI owns them (the glass navigation bar, the new player
+slider, the sheet style player, the queue and Connect sheets, the redesigned player header, the
+sleep timer's options sheet): while it is on it forces each of them, and their rows elsewhere show
+what it forces and take no touch, so the group has one switch. `SGGlassOwnsFlag` in
+Features/Flags/Flags.x holds the list. A change shows after Spotify restarts.
 
 Navbar is the exception and applies as soon as the bar lays out again. It lists the tabs in the order
 the bar shows them: drag to reorder, tap to hide or show, and Add a tab puts a page of Spotify's or

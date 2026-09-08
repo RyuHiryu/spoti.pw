@@ -34,7 +34,6 @@ static NSString *flagState(const SGFlagDef *flag, id value) {
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.overrideUserInterfaceStyle = UIUserInterfaceStyleDark;
-    self.tableView.backgroundColor = SGPageBackground();
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     self.tableView.keyboardDismissMode = UIScrollViewKeyboardDismissModeOnDrag;
     _search = [UISearchBar new];
@@ -103,6 +102,7 @@ static NSString *flagState(const SGFlagDef *flag, id value) {
     SGFillCell(cell, [key substringFromIndex:dot + 1],
              [NSString stringWithFormat:@"%@ · %@", [key substringToIndex:dot], flagState(flag, value)],
              value ? SGGreen() : nil, nil);
+    cell.backgroundColor = UIColor.clearColor;
     cell.selectionStyle = UITableViewCellSelectionStyleDefault;
 
     if (flag->type == SGFlagBool) {

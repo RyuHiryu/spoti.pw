@@ -17,7 +17,10 @@ UIViewController *SGAppearanceSettingsPage(void) {
     tabBar.defaultOn = NO;
     SGModRow *glass = SGOptionRow(@"Liquid Glass UI", @"Spotify's own glass navigation bar, slider and sheets, and with it the search field, now playing bar, artwork background and lyrics", SGKeySpotifyGlass);
     glass.changed = ^(BOOL on) { SGSetLiquidGlassUI(on); };
-    return [[SGModPage alloc] initWithTitle:@"UI Tweaks" intro:SGRestartNote sections:@[
+    return [[SGModPage alloc] initWithTitle:@"Appearance" intro:SGRestartNote sections:@[
+        SGSection(nil, @[
+            SGPageRow(@"Navbar", ^UIViewController *{ return SGNavbarSettingsPage(); }),
+        ]),
         SGSection(@"Liquid Glass", @[
             tabBar,
             SGOptionRow(@"Search field", @"Glass capsule instead of the white field", SGKeySearchField),

@@ -1,6 +1,6 @@
 // The mod's own settings, in Spotify's NSUserDefaults. Every key is declared by the feature that
-// owns it, in that feature's header, and starts with "spotifyglass.": Reset all settings in About
-// sweeps by that prefix and knows no key by name. The accessors here are what the hooks and the
+// owns it, in that feature's header, and starts with "spotifyglass.": Reset all settings on the Mod
+// page sweeps by that prefix and knows no key by name. The accessors here are what the hooks and the
 // pages share.
 #import <Foundation/Foundation.h>
 

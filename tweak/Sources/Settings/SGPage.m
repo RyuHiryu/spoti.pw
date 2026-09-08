@@ -1,4 +1,5 @@
 #import "SGPage.h"
+#import "SGPageStyle.h"
 #import "Core/SGCore.h"
 
 
@@ -12,6 +13,15 @@
 static BOOL sg_pagesConform;
 
 @implementation SGPage
+
+// Inset grouped cards on Spotify's dark grey, a hairline between the rows of a card.
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.overrideUserInterfaceStyle = UIUserInterfaceStyleDark;
+    self.tableView.backgroundColor = SGPageBackground();
+    self.tableView.separatorColor = [UIColor colorWithWhite:1 alpha:0.1];
+    self.tableView.sectionHeaderTopPadding = 0;
+}
 
 - (NSString *)spt_pageIdentifier {
     return @"spotifyglass";

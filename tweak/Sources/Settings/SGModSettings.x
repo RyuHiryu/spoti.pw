@@ -1,9 +1,10 @@
 // Settings: a Mod Settings row at the end of Spotify's settings list opens the mod's own pages:
-// UI Tweaks, Home, Playlist and Now Playing, each sections of switches (the mod's own and a few of
-// Spotify's remote-config flags), Navbar, the tab bar's own composition, and All flags, a
-// searchable list of every flag with an override per flag. The tweaks read the switches when they
-// run, so a change shows after Spotify restarts; the Navbar page is the exception and applies as
-// soon as the bar lays out again.
+// Appearance (with the Navbar, the tab bar's own composition, under it), Home & Library, Playlist
+// and Player, each sections of switches (the mod's own and a few of Spotify's remote-config
+// flags), Ads & privacy and Labs, All flags, a searchable list of every flag with an override per
+// flag, and Mod, the build, its updates and links. The tweaks read the switches when they run, so
+// a change shows after Spotify restarts; the Navbar page is the exception and applies as soon as
+// the bar lays out again.
 //
 // Tree (trees/settings.txt): SettingsListViewController.view > SettingsListCollectionView of
 //   Element_List cells 402x56: 24pt icon at x 12, 13pt white title and 11pt grey subtitle at
@@ -14,16 +15,20 @@
 #import "SGPageStyle.h"
 #import "SGModPage.h"
 #import "Features/Appearance/Appearance.h"
-#import "Features/Navbar/Navbar.h"
 #import "Features/Home/Home.h"
 #import "Features/Playlist/Playlist.h"
 #import "Features/NowPlaying/NowPlaying.h"
 #import "Features/Flags/Flags.h"
-#import "Features/Privacy/Privacy.h"
 #import "Features/About/About.h"
 
 static const CGFloat kRowHeight = 56;
 static char kRowKey, kInsetKey;
+
+static SGModRow *pageRow(NSString *title, NSString *symbol, UIViewController *(^page)(void)) {
+    SGModRow *row = SGPageRow(title, page);
+    row.symbol = symbol;
+    return row;
+}
 
 static UIViewController *modSettingsPage(void) {
     // Opening the page is the only thing that asks; the cache keeps it to once every six hours.
@@ -33,24 +38,25 @@ static UIViewController *modSettingsPage(void) {
     // that no switch can put right, and it is worth reading before anything else.
     SGModRow *signing = SGSigningWarningRow();
     if (signing) [sections addObject:SGSection(nil, @[signing])];
+    SGModRow *mod = pageRow(@"Mod", @"info.circle", ^UIViewController *{ return SGAboutPage(); });
+    mod.value = ^NSString *{ return @(SG_VERSION); };
     [sections addObjectsFromArray:@[
         SGSection(nil, @[
-            SGPageRow(@"UI Tweaks", ^UIViewController *{ return SGAppearanceSettingsPage(); }),
-            SGPageRow(@"Navbar", ^UIViewController *{ return SGNavbarSettingsPage(); }),
-            SGPageRow(@"Home & Library", ^UIViewController *{ return SGHomeSettingsPage(); }),
-            SGPageRow(@"Playlist", ^UIViewController *{ return SGPlaylistSettingsPage(); }),
-            SGPageRow(@"Now Playing", ^UIViewController *{ return SGNowPlayingSettingsPage(); }),
-            SGPageRow(@"Lock screen widget", ^UIViewController *{ return SGLockScreenSettingsPage(); }),
-            SGPageRow(@"Playback", ^UIViewController *{ return SGPlaybackSettingsPage(); }),
-            SGPageRow(@"Ads & nags", ^UIViewController *{ return SGAdsSettingsPage(); }),
-            SGPageRow(@"Unreleased", ^UIViewController *{ return SGUnreleasedSettingsPage(); }),
-            SGPageRow(@"Experimental", ^UIViewController *{ return SGExperimentalSettingsPage(); }),
-            SGPageRow(@"Privacy", ^UIViewController *{ return SGPrivacySettingsPage(); }),
-            SGPageRow(@"All flags", ^UIViewController *{ return SGAllFlagsPage(); }),
+            pageRow(@"Appearance", @"paintbrush", ^UIViewController *{ return SGAppearanceSettingsPage(); }),
+            pageRow(@"Home & Library", @"house", ^UIViewController *{ return SGHomeSettingsPage(); }),
+            pageRow(@"Playlist", @"music.note.list", ^UIViewController *{ return SGPlaylistSettingsPage(); }),
+            pageRow(@"Player", @"play.circle", ^UIViewController *{ return SGNowPlayingSettingsPage(); }),
         ]),
-        SGAboutSection(),
+        SGSection(nil, @[
+            pageRow(@"Ads & privacy", @"shield", ^UIViewController *{ return SGAdsSettingsPage(); }),
+            pageRow(@"Labs", @"testtube.2", ^UIViewController *{ return SGLabsPage(); }),
+        ]),
+        SGSection(nil, @[
+            pageRow(@"All flags", @"flag", ^UIViewController *{ return SGAllFlagsPage(); }),
+            mod,
+        ]),
     ]];
-    return [[SGModPage alloc] initWithTitle:@"Mod Settings" intro:nil sections:sections footer:nil];
+    return [[SGModPage alloc] initWithTitle:@"spoti.pw" intro:nil sections:sections footer:nil];
 }
 
 #pragma mark - row in the settings list

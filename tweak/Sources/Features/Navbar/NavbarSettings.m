@@ -64,17 +64,13 @@ static void appendTab(NSDictionary *tab) {
 }
 
 - (instancetype)init {
-    if (!(self = [super initWithStyle:UITableViewStyleGrouped])) return nil;
+    if (!(self = [super initWithStyle:UITableViewStyleInsetGrouped])) return nil;
     self.title = @"Add a Tab";
     return self;
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.overrideUserInterfaceStyle = UIUserInterfaceStyleDark;
-    self.tableView.backgroundColor = SGPageBackground();
-    self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-    self.tableView.sectionHeaderTopPadding = 0;
     _footer = SGNote(@"Anything Spotify can open by link works, so a playlist, an artist or a page of "
                    "your own goes on the bar the same way. Icons are Spotify's own: home, search, "
                    "collection, heart, playlist, album, artist, podcasts, audiobook, downloaded, "
@@ -167,17 +163,13 @@ static void appendTab(NSDictionary *tab) {
 }
 
 - (instancetype)init {
-    if (!(self = [super initWithStyle:UITableViewStyleGrouped])) return nil;
+    if (!(self = [super initWithStyle:UITableViewStyleInsetGrouped])) return nil;
     self.title = @"Navbar";
     return self;
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.overrideUserInterfaceStyle = UIUserInterfaceStyleDark;
-    self.tableView.backgroundColor = SGPageBackground();
-    self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-    self.tableView.sectionHeaderTopPadding = 0;
     self.tableView.allowsSelectionDuringEditing = YES;
     self.tableView.editing = YES;
     _intro = SGNote(@"Drag a tab by the handle to move it, tap it to show or hide it. The bar follows straight away.");

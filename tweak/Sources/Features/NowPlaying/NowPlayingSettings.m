@@ -1,6 +1,7 @@
 #import "Settings/SGModPage.h"
 #import "NowPlaying.h"
 #import "Features/Declutter/Declutter.h"
+#import "Features/Flags/Flags.h"
 
 static UIViewController *lyricsPage(void) {
     return [[SGModPage alloc] initWithTitle:@"Lyrics" intro:SGRestartNote sections:@[
@@ -17,7 +18,7 @@ static UIViewController *lyricsPage(void) {
 }
 
 UIViewController *SGNowPlayingSettingsPage(void) {
-    return [[SGModPage alloc] initWithTitle:@"Now Playing" intro:SGRestartNote sections:@[
+    NSMutableArray<SGModSection *> *sections = [NSMutableArray arrayWithArray:@[
         SGSection(@"Liquid Glass", @[
             SGOptionRow(@"Now playing bar", @"Glass card with round artwork", SGKeyNowPlayingBar),
             SGOptionRow(@"Artwork background", @"The cover blurred and dimmed behind the player instead of the flat album colour", SGKeyPlayerBackdrop),
@@ -57,8 +58,13 @@ UIViewController *SGNowPlayingSettingsPage(void) {
             SGHideRow(@"Merch", @"The artist's shop", SGHideMerch),
             SGHideRow(@"Recommendations", @"\"Artist: what you might like\", the episode and track rows", SGHideRecommendations),
         ]),
+    ]];
+    [sections addObjectsFromArray:SGPlaybackSections()];
+    [sections addObjectsFromArray:@[
+        SGLockScreenSection(),
         SGSection(nil, @[
             SGPageRow(@"Lyrics", ^UIViewController *{ return lyricsPage(); }),
         ]),
-    ] footer:nil];
+    ]];
+    return [[SGModPage alloc] initWithTitle:@"Player" intro:SGRestartNote sections:sections footer:nil];
 }

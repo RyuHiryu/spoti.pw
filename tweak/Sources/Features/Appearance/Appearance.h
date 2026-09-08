@@ -12,7 +12,7 @@ UIColor *SGAccentColor(void);   // nil while Spotify's own green is kept
 NSString *SGAccentLabel(void);  // "#RRGGBB", or the name of Spotify's own
 void SGPickAccent(void);        // the system colour picker over the top of the app, stored on the way out
 
-// Liquid Glass UI, the one switch of UI Tweaks that sets others: Spotify's own glass and, with
+// Liquid Glass UI, the one switch of Appearance that sets others: Spotify's own glass and, with
 // it, the search field, the now playing bar, the artwork background and the lyrics card. Each
 // stays a switch of its own afterwards.
 void SGSetLiquidGlassUI(BOOL on);

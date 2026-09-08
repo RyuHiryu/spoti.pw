@@ -6,12 +6,15 @@ UIColor *SGGrey(void);
 UIColor *SGGreen(void);
 UIColor *SGRed(void);
 UIColor *SGPageBackground(void);
+UIColor *SGCardBackground(void);
 UIFont *SGTitleFont(void);
 UIFont *SGSubtitleFont(void);
 // Takes the 13pt and 11pt fonts off Spotify's own settings list, once, so the pages match it.
 void SGAdoptFonts(UIView *list, UIView *exclude);
 
 UIImageView *SGSymbolView(NSString *name, CGFloat size, UIImageSymbolWeight weight, CGFloat box);
+// A symbol on a rounded grey square, the leading icon of a row that opens a page.
+UIImage *SGTileImage(NSString *symbol);
 // A grey note in a wrapper view, for a table header or footer; SGFitNote sizes it to its text.
 UIView *SGNote(NSString *text);
 void SGFitNote(UITableView *table, UIView *wrapper, CGFloat top, CGFloat bottom);

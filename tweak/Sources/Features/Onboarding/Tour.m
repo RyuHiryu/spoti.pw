@@ -362,7 +362,7 @@ static SGTourRow *actionRow(NSString *symbol, NSString *title, NSString *subtitl
     ]]];
     SGTourRow *lyricsOnly = switchRow(@"rectangle.compress.vertical", @"Only the lyrics", @"Hides every card under the player except lyrics: about the artist, videos, song DNA, credits, merch and the rest", SGKeyPlayerLyricsOnly, NO);
     lyricsOnly.changed = ^(BOOL on) { SGSetPlayerLyricsOnly(on); };
-    [pages addObject:[self pageWithSymbol:@"rectangle.compress.vertical" heading:@"Declutter." body:@"The player, down to the music. Every piece has a switch of its own under Now Playing in Mod Settings." rows:@[lyricsOnly]]];
+    [pages addObject:[self pageWithSymbol:@"rectangle.compress.vertical" heading:@"Declutter." body:@"The player, down to the music. Every piece has a switch of its own under Player in Mod Settings." rows:@[lyricsOnly]]];
     [pages addObject:[self navbarPage]];
     [pages addObject:[self pageWithSymbol:@"slider.horizontal.3" heading:@"Everything lives in Mod Settings." body:@"Spotify's Settings, last row. Every switch, the tab bar editor and all of Spotify's flags.\n\nFree and open source. A star is what keeps it going." rows:@[
         actionRow(@"star.fill", @"Star on GitHub", @"skopevoj/spoti.pw", ^{ SGOpenURL(SGRepoURL); }),

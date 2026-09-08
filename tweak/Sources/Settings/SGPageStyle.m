@@ -34,9 +34,10 @@ UIView *SGNote(NSString *text) {
 // loop forever.
 void SGFitNote(UITableView *table, UIView *wrapper, CGFloat top, CGFloat bottom) {
     UILabel *label = wrapper.subviews.firstObject;
-    CGFloat width = table.bounds.size.width - 32;
+    CGFloat inset = table.layoutMargins.left;
+    CGFloat width = table.bounds.size.width - 2 * inset;
     CGFloat height = ceil([label sizeThatFits:CGSizeMake(width, CGFLOAT_MAX)].height);
-    label.frame = CGRectMake(16, top, width, height);
+    label.frame = CGRectMake(inset, top, width, height);
     CGSize size = CGSizeMake(table.bounds.size.width, top + height + bottom);
     if (CGSizeEqualToSize(wrapper.bounds.size, size)) return;
     wrapper.frame = (CGRect){wrapper.frame.origin, size};
@@ -70,6 +71,21 @@ void SGInsetForBars(UITableView *table) {
 UIColor *SGGreen(void) { return SGAccentColor() ?: [UIColor colorWithRed:0x1E / 255.0 green:0xD7 / 255.0 blue:0x60 / 255.0 alpha:1]; }
 UIColor *SGRed(void) { return [UIColor colorWithRed:0xF1 / 255.0 green:0x5E / 255.0 blue:0x6B / 255.0 alpha:1]; }
 UIColor *SGPageBackground(void) { return SGFlag(SGKeyAmoled, NO) ? UIColor.blackColor : [UIColor colorWithWhite:0x12 / 255.0 alpha:1]; }
+// Spotify's own elevated grey on its dark grey; iOS's own card grey on the AMOLED black.
+UIColor *SGCardBackground(void) { return [UIColor colorWithWhite:(SGFlag(SGKeyAmoled, NO) ? 0x1C : 0x2A) / 255.0 alpha:1]; }
+
+UIImage *SGTileImage(NSString *symbol) {
+    UIImageSymbolConfiguration *config = [UIImageSymbolConfiguration configurationWithPointSize:14 weight:UIImageSymbolWeightMedium];
+    UIImage *glyph = [[UIImage systemImageNamed:symbol withConfiguration:config] imageWithTintColor:UIColor.whiteColor renderingMode:UIImageRenderingModeAlwaysOriginal];
+    CGRect box = CGRectMake(0, 0, 28, 28);
+    UIImage *tile = [[[UIGraphicsImageRenderer alloc] initWithSize:box.size] imageWithActions:^(UIGraphicsImageRendererContext *ctx) {
+        [[UIColor colorWithWhite:1 alpha:0.12] setFill];
+        [[UIBezierPath bezierPathWithRoundedRect:box cornerRadius:7] fill];
+        CGSize size = glyph.size;
+        [glyph drawInRect:CGRectMake((box.size.width - size.width) / 2, (box.size.height - size.height) / 2, size.width, size.height)];
+    }];
+    return [tile imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+}
 
 const CGFloat SGSectionHeaderHeight = 38;
 
@@ -91,7 +107,7 @@ void SGFillCell(UITableViewCell *cell, NSString *title, NSString *subtitle, UICo
         content.imageToTextPadding = 14;
     }
     cell.contentConfiguration = content;
-    cell.backgroundColor = UIColor.clearColor;
+    cell.backgroundColor = SGCardBackground();
     cell.accessoryView = nil;
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
 }

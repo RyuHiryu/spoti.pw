@@ -112,11 +112,11 @@ reuse it; `make flags` regenerates it.
 
 ## Mod Settings
 
-Settings → Mod Settings is one page per area: UI Tweaks, Home & Library, Playlist, Now Playing,
-Lock screen widget, Playback, Ads & nags, Unreleased and Experimental, then Privacy, Navbar and
-All flags. A switch on a page forces one of Spotify's flags; off leaves Spotify's own value, and
-All flags is where a flag goes back to Auto. Navbar applies straight away, everything else after
-Spotify restarts.
+Settings → Mod Settings is one page per area: Appearance (with Navbar under it), Home & Library,
+Playlist and Player; Ads & privacy and Labs; then All flags and Mod, which holds the version,
+updates, links, the welcome tour and the reset. A switch on a page forces one of Spotify's flags;
+off leaves Spotify's own value, and All flags is where a flag goes back to Auto. Navbar applies
+straight away, everything else after Spotify restarts.
 
 ## Hack on it
 

@@ -102,7 +102,7 @@ SGModRow *SGPageRow(NSString *title, UIViewController *(^page)(void)) {
 }
 
 - (instancetype)initWithTitle:(NSString *)title key:(NSString *)key choices:(NSArray<NSString *> *)choices fallback:(NSInteger)fallback {
-    if (!(self = [super initWithStyle:UITableViewStyleGrouped])) return nil;
+    if (!(self = [super initWithStyle:UITableViewStyleInsetGrouped])) return nil;
     self.title = title;
     _key = key;
     _choices = choices;
@@ -110,13 +110,6 @@ SGModRow *SGPageRow(NSString *title, UIViewController *(^page)(void)) {
     return self;
 }
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    self.overrideUserInterfaceStyle = UIUserInterfaceStyleDark;
-    self.tableView.backgroundColor = SGPageBackground();
-    self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-    self.tableView.sectionHeaderTopPadding = 0;
-}
 
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
@@ -235,7 +228,7 @@ static BOOL flagRowLocked(SGModRow *row) {
 }
 
 - (instancetype)initWithTitle:(NSString *)title intro:(NSString *)intro sections:(NSArray<SGModSection *> *)sections footer:(NSString *)footer {
-    if (!(self = [super initWithStyle:UITableViewStyleGrouped])) return nil;
+    if (!(self = [super initWithStyle:UITableViewStyleInsetGrouped])) return nil;
     self.title = title;
     _sections = sections;
     _intro = intro ? SGNote(intro) : nil;
@@ -248,10 +241,6 @@ static BOOL flagRowLocked(SGModRow *row) {
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.overrideUserInterfaceStyle = UIUserInterfaceStyleDark;
-    self.tableView.backgroundColor = SGPageBackground();
-    self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-    self.tableView.sectionHeaderTopPadding = 0;
     self.tableView.tableHeaderView = _intro;
     self.tableView.tableFooterView = _footer;
 }
@@ -324,11 +313,11 @@ static BOOL flagRowLocked(SGModRow *row) {
     UITableViewCell *cell = SGDequeueCell(table, @"row");
     SGModRow *row = [self rowAt:path];
     SGFillCell(cell, row.title, row.subtitle, row.color, row.symbol);
-    if (row.color) {
-        UIListContentConfiguration *content = (UIListContentConfiguration *)cell.contentConfiguration;
-        content.secondaryTextProperties.color = row.color;
-        cell.contentConfiguration = content;
-    }
+    UIListContentConfiguration *content = (UIListContentConfiguration *)cell.contentConfiguration;
+    if (row.color) content.secondaryTextProperties.color = row.color;
+    if (row.page && row.symbol) content.image = SGTileImage(row.symbol);
+    cell.contentConfiguration = content;
+    cell.separatorInset = UIEdgeInsetsMake(0, row.symbol ? (row.page ? 58 : 48) : 16, 0, 0);
 
     if (row.key) {
         UISwitch *toggle = [UISwitch new];

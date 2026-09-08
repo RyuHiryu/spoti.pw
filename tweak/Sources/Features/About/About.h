@@ -23,4 +23,4 @@ SGModRow *SGSigningWarningRow(void);          // nil while the signature is soun
 void SGCheckSigningOnce(void);
 void SGShowSigningFixIfPending(void);   // the sheet the tour held back, if any
 
-SGModSection *SGAboutSection(void);
+UIViewController *SGAboutPage(void);   // the Mod page

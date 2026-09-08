@@ -72,17 +72,21 @@ Sign and install that link, check the About row says $version, then: make push
 MSG
 }
 
+commit_if_changed() {
+  local repo="$1" file="$2" mod="$3"
+  [ -n "$(git -C "$repo" status --porcelain -- "$file")" ] || return 0
+  git -C "$repo" add "$file"
+  git -C "$repo" commit -m "release: $mod"
+}
+
 push() {
   local mod
   mod="$(release_field mod)"
   [ "$mod" = "$(control_version)" ] || die "release.json says $mod but control says $(control_version); run make publish"
-  [ -n "$(git -C "$WEB" status --porcelain -- content/release.json)" ] || die "release.json is unchanged; run make publish first"
-
-  git -C "$WEB" add content/release.json
-  git -C "$WEB" commit -m "release: $mod"
+  # Either file may already be committed by hand; then only the push is left.
+  commit_if_changed "$WEB" content/release.json "$mod"
   git -C "$WEB" push
-  git -C "$ROOT" add tweak/control
-  git -C "$ROOT" commit -m "release: $mod"
+  commit_if_changed "$ROOT" tweak/control "$mod"
   git -C "$ROOT" push
   echo "==> $mod is live once Coolify finishes: $(release_field ipaUrl)"
 }

@@ -24,3 +24,5 @@ UIView *SGSectionHeader(UITableView *table, NSString *title);
 UITableViewCell *SGDequeueCell(UITableView *table, NSString *identifier);
 
 void SGOpenURL(NSString *url);
+// The controller on top of the key window, through whatever is presented over it.
+UIViewController *SGTopController(void);

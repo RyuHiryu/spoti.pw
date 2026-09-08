@@ -1,5 +1,6 @@
 #import "Settings/SGPageStyle.h"
 #import "About.h"
+#import "Features/Onboarding/Onboarding.h"
 
 // Which build this is, whether the site has a newer one, and where to reach the mod: without these
 // rows a build that is already installed has no way of telling its user that anything moved on.
@@ -13,5 +14,6 @@ SGModSection *SGAboutSection(void) {
         }, ^{ SGCheckForUpdate(YES); }),
         SGLinkRow(@"Website", @"Downloads, and the source to add to AltStore or SideStore", SGSiteURL),
         SGLinkRow(@"GitHub", @"Source, releases and issues", SGRepoURL),
+        SGActionRow(@"Welcome tour", @"The pages from the first launch, again", ^{ SGShowOnboarding(); }),
     ]);
 }

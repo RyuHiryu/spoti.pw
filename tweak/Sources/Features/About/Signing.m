@@ -9,11 +9,13 @@
 #import "Core/SGCore.h"
 #import "Settings/SGPageStyle.h"
 #import "About.h"
+#import "Features/Onboarding/Onboarding.h"
 #import <dlfcn.h>
 
 NSString *const SGSigningHelpURL = @"https://github.com/skopevoj/spoti.pw#signing-it-yourself";
 
 static NSString *const kWarned = @"spotifyglass.signing.warned";
+static BOOL sg_fixPending;
 
 // SecTaskCopyValueForEntitlement is not in the iOS SDK, so it is resolved at runtime like the rest
 // of the private API the mod uses. A build that cannot read its own entitlement stays quiet.
@@ -48,25 +50,12 @@ BOOL SGSigningOpensFromLockScreen(void) {
     return !appID || [appID isEqualToString:NSBundle.mainBundle.bundleIdentifier];
 }
 
-static UIViewController *topController(void) {
-    UIViewController *top = nil;
-    for (UIScene *scene in UIApplication.sharedApplication.connectedScenes) {
-        if (![scene isKindOfClass:UIWindowScene.class]) continue;
-        for (UIWindow *window in ((UIWindowScene *)scene).windows) {
-            if (window.hidden) continue;
-            if (!top || window.isKeyWindow) top = window.rootViewController;
-        }
-    }
-    while (top.presentedViewController) top = top.presentedViewController;
-    return top;
-}
-
 // The fix is one string, so the sheet leads with it and Copy is the first action: whoever reads this
 // is on their way back to Feather to paste it into the identifier field.
 static void showFix(void) {
     NSString *appID = SGSigningAppIdentifier();
     NSString *bundleID = NSBundle.mainBundle.bundleIdentifier ?: @"?";
-    UIViewController *top = topController();
+    UIViewController *top = SGTopController();
     if (!appID || !top) return;
     NSString *message = [NSString stringWithFormat:
         @"Sign Spotify again with the bundle id set to\n\n%@\n\n"
@@ -115,7 +104,15 @@ void SGCheckSigningOnce(void) {
                                                                   usingBlock:^(NSNotification *note) {
         [NSNotificationCenter.defaultCenter removeObserver:token];
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            showFix();
+            // The welcome tour has the screen; it shows the fix when it goes.
+            if (SGOnboardingShowing()) sg_fixPending = YES;
+            else showFix();
         });
     }];
+}
+
+void SGShowSigningFixIfPending(void) {
+    if (!sg_fixPending) return;
+    sg_fixPending = NO;
+    showFix();
 }

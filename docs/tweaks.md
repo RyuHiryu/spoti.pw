@@ -12,10 +12,9 @@
     tweak/Sources/Features/     one directory per feature, see below
     tweak/Sources/Diagnostics/  screen dumps and the tree server of FLEX builds
     scripts/                    pipeline.sh (build + inject), install.sh (sign + install), record-trees.py,
-                                dump-log.sh, extract-flags.py, make-manifests.py
+                                dump-log.sh, extract-flags.py, publish.sh (release: build, catbox, site manifest)
     trees/                      recorded view trees, one per screen; the input for every new hook
     plist/                      Info.plist overrides merged into the app (turns UIDesignRequiresCompatibility off)
-    site/                       the manifests spoti.pw serves (version.json, AltStore and Scarlet sources)
     vendor/                     AutoFLEX deb
     ipa/, out/                  decrypted Spotify IPA in, built IPAs out (both gitignored)
 
@@ -43,6 +42,7 @@ app:
     AdBlock/      EeveeSpotify's ad blocking: the ad and upsell services silenced (AdServices.x), ad components out of the
                   Hub JSON (AdHubs.x) and the feeds (Feeds.m), Premium pop-ups dropped (AdPopups.x), and the responses
                   rewritten on the way in (AdNetwork.x, Premium.m over the protobuf walker in Protobuf.m)
+    Onboarding/   the welcome tour over Home on the first launch (Onboarding.x, the pages in Tour.m), offered again from About
     About/        the update check and the About section of the root page
 
 A hook reads its switch when it runs (`SGEnabled`, `SGHidden`, `SGFlag` from Core/SGPrefs.h), so a

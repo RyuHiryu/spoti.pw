@@ -7,13 +7,17 @@ IPA ?= $(firstword $(wildcard ipa/*.ipa))
 FLEX ?= 0
 FLEX_ARG := $(if $(filter 0,$(FLEX)),--no-flex,)
 
-.PHONY: build release install trees log flags
+.PHONY: build release install publish push trees log flags
 build:    ## FLEX + glass IPA into out/
 	./scripts/pipeline.sh $(IPA)
 release:  ## glass only, no FLEX
 	./scripts/pipeline.sh $(IPA) --no-flex
 install:  ## build, sign with your certificate, push to the phone on USB (FLEX=1 to take FLEX too)
 	./scripts/pipeline.sh $(IPA) --install $(FLEX_ARG)
+publish:  ## VERSION=0.15.0 NOTES="..." : build, upload to catbox, write the site's release.json, print the link
+	./scripts/publish.sh stage "$(IPA)" "$(VERSION)" "$(NOTES)"
+push:     ## commit and push the staged release in both repos (after testing the link)
+	./scripts/publish.sh push
 trees:    ## record per-screen view trees into trees/ (needs a FLEX build on the phone)
 	./scripts/record-trees.py
 log:      ## stream the tweak's log lines from the phone

@@ -21,5 +21,6 @@ NSString *SGSigningAppIdentifier(void);      // App ID without the team prefix, 
 BOOL SGSigningOpensFromLockScreen(void);     // YES when unreadable, so a build that works stays quiet
 SGModRow *SGSigningWarningRow(void);          // nil while the signature is sound
 void SGCheckSigningOnce(void);
+void SGShowSigningFixIfPending(void);   // the sheet the tour held back, if any
 
 SGModSection *SGAboutSection(void);

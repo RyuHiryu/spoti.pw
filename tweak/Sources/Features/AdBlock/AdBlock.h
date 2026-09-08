@@ -11,6 +11,9 @@
 #define SGKeyHideUpsells @"spotifyglass.adblock.upsells"
 #define SGKeyFakePremium @"spotifyglass.adblock.premium"
 
+// What a switch turning Pretend to be Premium on is told first.
+extern NSString *const SGFakePremiumWarning;
+
 // A flag the ads or upsells switch forces off while it is on. Flags.x asks, and the row for it locks.
 BOOL SGAdBlockForcesFlagOff(NSString *key);
 

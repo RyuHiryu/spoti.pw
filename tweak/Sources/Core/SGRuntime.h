@@ -23,3 +23,16 @@
 @interface UIViewController (SGPrivate)
 - (NSString *)_printHierarchy;
 @end
+
+@interface UIButtonConfiguration (SGiOS26)
++ (instancetype)glassButtonConfiguration;
++ (instancetype)prominentGlassButtonConfiguration;
+@end
+
+@interface UIImageView (SGiOS17)
+- (void)addSymbolEffect:(id)effect;
+@end
+
+@interface NSObject (SGiOS17)
++ (id)effect;   // NSSymbolBounceEffect and the other symbol effects
+@end

@@ -131,6 +131,19 @@ void SGAdoptFonts(UIView *list, UIView *row) {
     });
 }
 
+UIViewController *SGTopController(void) {
+    UIViewController *top = nil;
+    for (UIScene *scene in UIApplication.sharedApplication.connectedScenes) {
+        if (![scene isKindOfClass:UIWindowScene.class]) continue;
+        for (UIWindow *window in ((UIWindowScene *)scene).windows) {
+            if (window.hidden) continue;
+            if (!top || window.isKeyWindow) top = window.rootViewController;
+        }
+    }
+    while (top.presentedViewController) top = top.presentedViewController;
+    return top;
+}
+
 void SGOpenURL(NSString *url) {
     NSURL *target = url ? [NSURL URLWithString:url] : nil;
     if (!target) return;

@@ -3,6 +3,7 @@
 // Glass switch then forces the flags of Spotify's own newer design, which it ships switched off.
 #import "Core/SGCore.h"
 #import "Flags.h"
+#import "Features/AdBlock/AdBlock.h"
 
 BOOL SGGlassOwnsFlag(NSString *key) {
     static NSSet<NSString *> *owned;
@@ -25,6 +26,7 @@ BOOL SGGlassOwnsFlag(NSString *key) {
 static id forced(NSString *key) {
     id value = SGFlagOverride(key);
     if (!value && SGEnabled(SGKeySpotifyGlass) && SGGlassOwnsFlag(key)) value = @YES;
+    if (!value && SGAdBlockForcesFlagOff(key)) value = @NO;
     return value;
 }
 

@@ -1,6 +1,7 @@
 // Pages that list Spotify's flags by topic; every row forces one flag.
 #import "Settings/SGModPage.h"
 #import "Flags.h"
+#import "Features/AdBlock/AdBlock.h"
 
 UIViewController *SGLockScreenSettingsPage(void) {
     return [[SGModPage alloc] initWithTitle:@"Lock screen widget" intro:SGRestartNote sections:@[
@@ -38,6 +39,9 @@ UIViewController *SGPlaybackSettingsPage(void) {
 // Every switch here forces a flag Spotify ships on to off, so the switch off is Spotify's own value.
 UIViewController *SGAdsSettingsPage(void) {
     return [[SGModPage alloc] initWithTitle:@"Ads & nags" intro:SGRestartNote sections:@[
+        SGSection(nil, @[
+            SGPageRow(@"Ad blocking", ^UIViewController *{ return SGAdBlockSettingsPage(); }),
+        ]),
         SGSection(@"Ads", @[
             SGKillRow(@"Ad when the app opens", @"ios-feature-adonappopen.enabled"),
             SGKillRow(@"Its CTA card", @"ios-feature-adonappopen.cta_card_enabled"),

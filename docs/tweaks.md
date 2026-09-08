@@ -40,6 +40,9 @@ app:
     Appearance/   AMOLED (Amoled.x), the glass search field (SearchField.x), and Repaint.x, which keeps stripped areas transparent
     Flags/        Spotify's remote-config flags: the provider hook, the generated table, the All flags page and the topic pages
     Privacy/      telemetry blocking and its counters
+    AdBlock/      EeveeSpotify's ad blocking: the ad and upsell services silenced (AdServices.x), ad components out of the
+                  Hub JSON (AdHubs.x) and the feeds (Feeds.m), Premium pop-ups dropped (AdPopups.x), and the responses
+                  rewritten on the way in (AdNetwork.x, Premium.m over the protobuf walker in Protobuf.m)
     About/        the update check and the About section of the root page
 
 A hook reads its switch when it runs (`SGEnabled`, `SGHidden`, `SGFlag` from Core/SGPrefs.h), so a
@@ -65,7 +68,9 @@ tab and Spotify's home and library flags), Playlist (hide the cover, the
 header's text and buttons, the curation pills), Now Playing (glass, Spotify's player flags, hide
 buttons and cards of the full screen player, and a Lyrics page under it), Lock screen widget,
 Playback (speed, queue, the player and the now playing bar), Ads & nags (every switch forces a flag
-Spotify ships on to off: the ad on app open, upsells, tooltips, the DJ badge), Unreleased (features
+Spotify ships on to off: the ad on app open, upsells, tooltips, the DJ badge; and an Ad blocking page
+under it, EeveeSpotify's layers behind three switches that start off: hide ads, hide upsells and
+pretend to be Premium, with a count of what each stopped), Unreleased (features
 Spotify built and did not ship) and Experimental, which holds AI Chat (Martini). Then Privacy,
 telemetry blocking with a count of what it has stopped; Navbar, the tab bar's own composition; and
 All flags, Spotify's remote-config flags with a search field and an Auto / Off / On control per flag

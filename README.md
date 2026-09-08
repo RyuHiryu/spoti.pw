@@ -42,12 +42,15 @@ jailbreak. Every piece sits behind its own switch in Settings → Mod Settings.
 - Speed control and trim silence for music, not only podcasts
 - Picture in picture, in the app and out of it
 - No ad on app open, no upsells, no tooltips, no DJ badge
+- EeveeSpotify's ad blocking, ported: ad services, upsells and a Premium product state, each behind its own switch
 - Telemetry blocked, with a count of what it stopped
 - Hide anything: Home shortcuts, playlist header, player buttons and the cards under them
 - Unreleased features Spotify built and never shipped
 - Every remote-config flag Spotify ships, searchable, Auto / Off / On
 
-Purely cosmetic. It does not unlock Premium.
+Cosmetic until asked otherwise. The Ad blocking page holds EeveeSpotify's layers, every one off by default;
+the Premium one rewrites what the server says about the account, is the part Spotify's takedowns have
+gone after, and is untested here.
 
 ## Get it
 

@@ -55,6 +55,45 @@ static void traceField(UIView *button, NSString *when) {
           dim ? NSStringFromClass(dim.class) : @"nothing");
 }
 
+// traceField only says what the field looked like at a layout pass, and the second it is invisible
+// for holds no layout pass at all: coming back from the full screen search the last pass before it
+// lands is 1077ms earlier (a log of three trips in and out). So the field is put on a clock of its
+// own as well, sampled every 50ms for the two seconds after it comes back into a window, which is
+// the window the glitch lives in. Debug builds only, like the rest of the tracing.
+static void sampleField(__weak UIView *weakButton, int step) {
+    UIView *button = weakButton;
+    if (!button || step > 40) return;
+    UIWindow *window = button.window;
+    UIView *dim = nil;
+    for (UIView *v = button; v && !dim; v = v.superview) {
+        if (v.hidden || v.alpha < 0.99) dim = v;
+    }
+    UIView *pane = nil;
+    for (UIView *sub in button.subviews) {
+        if ([sub isKindOfClass:UIVisualEffectView.class]) pane = sub;
+    }
+    CGColorRef fill = button.layer.backgroundColor;
+    SGLog(@"search field +%4dms: window %d, in window %@, alpha %.2f hidden %d, dimmed by %@, pane %@ alpha %.2f, fill alpha %.2f, radius %.1f",
+          step * 50, window != nil,
+          NSStringFromCGRect([button convertRect:button.bounds toView:window]),
+          button.alpha, button.hidden, dim ? NSStringFromClass(dim.class) : @"nothing",
+          pane ? @"attached" : @"missing", pane ? pane.alpha : -1,
+          fill ? CGColorGetAlpha(fill) : -1, button.layer.cornerRadius);
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.05 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        sampleField(weakButton, step + 1);
+    });
+}
+
+// One burst per arrival, so three trips in and out read as three bursts rather than three overlaid.
+static void traceFieldArriving(UIView *button) {
+    if (!SGIsDebugBuild() || !button.window) return;
+    static NSTimeInterval last;
+    NSTimeInterval now = NSDate.timeIntervalSinceReferenceDate;
+    if (now - last < 2.5) return;
+    last = now;
+    sampleField(button, 0);
+}
+
 static void styleSearchField(UIView *button) {
     if (!SGEnabled(SGKeySearchField)) return;
     CGSize size = button.bounds.size;
@@ -84,7 +123,10 @@ static void styleSearchField(UIView *button) {
 // Back from the full screen search the field is styled before it draws, not a layout pass later.
 - (void)didMoveToWindow {
     %orig;
-    if (isSearchField((UIView *)self)) traceField((UIView *)self, @"moved");
+    if (isSearchField((UIView *)self)) {
+        traceField((UIView *)self, @"moved");
+        traceFieldArriving((UIView *)self);
+    }
     styleSearchField((UIView *)self);
 }
 // Spotify builds the field's content again when the page comes back, which can take the pane out

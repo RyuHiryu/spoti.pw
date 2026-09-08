@@ -3,6 +3,7 @@
 #import "Core/SGCore.h"
 #import "Features/Flags/Flags.h"
 #import "Features/About/About.h"
+#import "Features/AdBlock/AdBlock.h"
 
 NSString *const SGRestartNote = @"Changes apply after you restart Spotify.";
 
@@ -221,7 +222,8 @@ static BOOL flagRowOn(SGModRow *row) {
 // A flag the Spotify's own Liquid Glass switch owns: its row shows what that switch forces and
 // takes no touch, so the flag has one place to change. An override from All flags still wins.
 static BOOL flagRowLocked(SGModRow *row) {
-    return row.flag && SGGlassOwnsFlag(row.key) && SGEnabled(SGKeySpotifyGlass);
+    if (!row.flag) return NO;
+    return (SGGlassOwnsFlag(row.key) && SGEnabled(SGKeySpotifyGlass)) || (row.forceOff && SGAdBlockForcesFlagOff(row.key));
 }
 
 @implementation SGModPage {

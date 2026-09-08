@@ -55,7 +55,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: inputs.upload_method != 'filebin'
         with:
-          name: spotifyglass-ipa
+          name: spoti.ipa
           path: out/*.ipa
           if-no-files-found: error
 

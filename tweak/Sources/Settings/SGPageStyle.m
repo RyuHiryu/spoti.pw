@@ -67,6 +67,7 @@ void SGInsetForBars(UITableView *table) {
 }
 
 UIColor *SGGreen(void) { return [UIColor colorWithRed:0x1E / 255.0 green:0xD7 / 255.0 blue:0x60 / 255.0 alpha:1]; }
+UIColor *SGRed(void) { return [UIColor colorWithRed:0xF1 / 255.0 green:0x5E / 255.0 blue:0x6B / 255.0 alpha:1]; }
 UIColor *SGPageBackground(void) { return [UIColor colorWithWhite:0x12 / 255.0 alpha:1]; }
 
 const CGFloat SGSectionHeaderHeight = 38;

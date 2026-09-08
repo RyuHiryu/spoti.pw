@@ -4,6 +4,7 @@
 
 UIColor *SGGrey(void);
 UIColor *SGGreen(void);
+UIColor *SGRed(void);
 UIColor *SGPageBackground(void);
 UIFont *SGTitleFont(void);
 UIFont *SGSubtitleFont(void);

@@ -12,4 +12,14 @@ NSString *SGUpdateNotes(void);
 NSString *SGUpdateStatus(void);
 void SGCheckForUpdate(BOOL force);
 
+
+// Whether the now playing card on the lock screen can open this build. It depends on the signature,
+// not on the mod: iOS launches by the App ID of the application-identifier entitlement, so a build
+// whose bundle id is not that App ID cannot be opened from the card. Signing.m says so once.
+extern NSString *const SGSigningHelpURL;
+NSString *SGSigningAppIdentifier(void);      // App ID without the team prefix, nil if unreadable
+BOOL SGSigningOpensFromLockScreen(void);     // YES when unreadable, so a build that works stays quiet
+SGModRow *SGSigningWarningRow(void);          // nil while the signature is sound
+void SGCheckSigningOnce(void);
+
 SGModSection *SGAboutSection(void);

@@ -21,8 +21,10 @@ SIGNED="${IN%.ipa}-signed.ipa"
 command -v zsign >/dev/null || { echo "missing zsign -> brew install zsign" >&2; exit 1; }
 command -v ideviceinstaller >/dev/null || { echo "missing ideviceinstaller -> brew install ideviceinstaller" >&2; exit 1; }
 
-# A profile with a fixed App ID (signing services) may only install when the bundle id equals that
-# App ID. Try the IPA's own bundle id first; fall back to the App ID if iOS rejects the signature.
+# The bundle id has to equal the App ID of the profile. iOS may well install a mismatched pair, but
+# MediaRemote launches the now playing app by its application-identifier entitlement rather than by
+# CFBundleIdentifier, so tapping the lock screen card then asks for a bundle that does not exist and
+# nothing opens. A wildcard App ID needs no rewrite: the entitlement takes the IPA's own bundle id.
 PROFILE_PLIST="$(mktemp)"
 security cms -D -i "$SIGN_PROFILE" > "$PROFILE_PLIST" 2>/dev/null
 APP_ID="$(plutil -extract Entitlements.application-identifier raw -o - "$PROFILE_PLIST" 2>/dev/null || true)"
@@ -34,17 +36,6 @@ sign() {  # sign [bundle id]
   zsign -k "$SIGN_P12" -p "$SIGN_P12_PASSWORD" -m "$SIGN_PROFILE" ${1:+-b "$1"} -z 1 -o "$SIGNED" "$IN" >/dev/null
 }
 
-sign
+if [ -n "$APP_ID" ] && [ "$APP_ID" != "*" ]; then sign "$APP_ID"; else sign; fi
 echo "==> installing $SIGNED"
-set +e
-OUTPUT="$(ideviceinstaller ${WIFI:+-n} install "$SIGNED" 2>&1)"
-STATUS=$?
-set -e
-echo "$OUTPUT" | tail -3
-if [ $STATUS -ne 0 ] && [ -n "$APP_ID" ] && [ "$APP_ID" != "*" ] && echo "$OUTPUT" | grep -qiE "entitlement|application-identifier|signature|ApplicationVerificationFailed"; then
-  echo "==> iOS rejected that bundle id with this profile, retrying as $APP_ID"
-  sign "$APP_ID"
-  ideviceinstaller ${WIFI:+-n} install "$SIGNED" 2>&1 | tail -3
-elif [ $STATUS -ne 0 ]; then
-  exit $STATUS
-fi
+ideviceinstaller ${WIFI:+-n} install "$SIGNED" 2>&1 | tail -3

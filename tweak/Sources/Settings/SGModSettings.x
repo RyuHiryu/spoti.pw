@@ -28,7 +28,12 @@ static char kRowKey, kInsetKey;
 static UIViewController *modSettingsPage(void) {
     // Opening the page is the only thing that asks; the cache keeps it to once every six hours.
     SGCheckForUpdate(NO);
-    return [[SGModPage alloc] initWithTitle:@"Mod Settings" intro:nil sections:@[
+    NSMutableArray<SGModSection *> *sections = [NSMutableArray array];
+    // A build the lock screen cannot open leads the page, above the tweaks: it is the one thing here
+    // that no switch can put right, and it is worth reading before anything else.
+    SGModRow *signing = SGSigningWarningRow();
+    if (signing) [sections addObject:SGSection(nil, @[signing])];
+    [sections addObjectsFromArray:@[
         SGSection(nil, @[
             SGPageRow(@"UI Tweaks", ^UIViewController *{ return SGAppearanceSettingsPage(); }),
             SGPageRow(@"Navbar", ^UIViewController *{ return SGNavbarSettingsPage(); }),
@@ -44,7 +49,8 @@ static UIViewController *modSettingsPage(void) {
             SGPageRow(@"All flags", ^UIViewController *{ return SGAllFlagsPage(); }),
         ]),
         SGAboutSection(),
-    ] footer:nil];
+    ]];
+    return [[SGModPage alloc] initWithTitle:@"Mod Settings" intro:nil sections:sections footer:nil];
 }
 
 #pragma mark - row in the settings list
@@ -169,4 +175,5 @@ static BOOL isSettingsRoot(UIViewController *list) {
     %init;
     SGRequireClasses(@[@"_TtC21Settings_PlatformImpl26SettingsListViewController"]);
     SGRegisterPages();
+    SGCheckSigningOnce();
 }

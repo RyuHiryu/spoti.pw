@@ -14,8 +14,14 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 THEOS="${THEOS:-$HOME/theos}"
 FLEX_DEB="$ROOT/vendor/com.hopeless.autoflex_0.0.1_iphoneos-arm.deb"
-# Installs next to the real Spotify instead of replacing it. Override: BUNDLE_ID=com.spotify.client make build
-BUNDLE_ID="${BUNDLE_ID:-com.spotify.client2}"
+# The bundle id is left alone by default, the way EeveeSpotify and the YouTube mods leave it. Rewriting
+# it only works when it ends up equal to the App ID of the profile that signs the IPA, and this build
+# has no idea what that profile will be -- it is picked later, in Feather or whatever else the person
+# signing uses. A mismatched pair still installs, but MediaRemote launches the now playing app by its
+# application-identifier entitlement, so tapping the lock screen card asks for a bundle that does not
+# exist and nothing opens. Set BUNDLE_ID only if you know it matches your App ID; scripts/install.sh
+# reads that App ID out of the profile and can do it safely.
+BUNDLE_ID="${BUNDLE_ID:-}"
 mkdir -p "$ROOT/out"
 
 IN="" OUT="" WITH_FLEX=1 INSTALL=0
@@ -68,7 +74,7 @@ FILES=("$TWEAK_DEB")
 
 echo "==> injecting"
 # -w drops the Watch app: its companion-app key would still name com.spotify.client and block the install.
-cyan -i "$IN" -o "$OUT" -f "${FILES[@]}" -l "$ROOT/plist/liquid-glass.plist" -b "$BUNDLE_ID" -w -s --overwrite
+cyan -i "$IN" -o "$OUT" -f "${FILES[@]}" -l "$ROOT/plist/liquid-glass.plist" ${BUNDLE_ID:+-b "$BUNDLE_ID"} -w -s --overwrite
 
 echo "==> done: $OUT"
 [ "$INSTALL" = 1 ] && exec "$ROOT/scripts/install.sh" "$OUT"

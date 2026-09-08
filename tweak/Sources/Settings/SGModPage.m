@@ -70,6 +70,15 @@ SGModRow *SGActionRow(NSString *title, NSString *subtitle, void (^action)(void))
     return row;
 }
 
+// Red, with a warning symbol. SGFillCell tints the title and the symbol; the cell below takes the
+// colour down to the subtitle too, so the whole row reads as the warning it is.
+SGModRow *SGWarningRow(NSString *title, NSString *subtitle, void (^action)(void)) {
+    SGModRow *row = SGActionRow(title, subtitle, action);
+    row.color = SGRed();
+    row.symbol = @"exclamationmark.triangle.fill";
+    return row;
+}
+
 // No subtitle: a list of pages reads as a list, not as a wall of explanations.
 SGModRow *SGPageRow(NSString *title, UIViewController *(^page)(void)) {
     SGModRow *row = [SGModRow new];
@@ -206,7 +215,12 @@ static BOOL flagRowLocked(SGModRow *row) {
 - (UITableViewCell *)tableView:(UITableView *)table cellForRowAtIndexPath:(NSIndexPath *)path {
     UITableViewCell *cell = SGDequeueCell(table, @"row");
     SGModRow *row = [self rowAt:path];
-    SGFillCell(cell, row.title, row.subtitle, nil, nil);
+    SGFillCell(cell, row.title, row.subtitle, row.color, row.symbol);
+    if (row.color) {
+        UIListContentConfiguration *content = (UIListContentConfiguration *)cell.contentConfiguration;
+        content.secondaryTextProperties.color = row.color;
+        cell.contentConfiguration = content;
+    }
 
     if (row.key) {
         UISwitch *toggle = [UISwitch new];

@@ -17,6 +17,8 @@
 @property (nonatomic, copy) NSString *(^value)(void);
 @property (nonatomic, copy) void (^action)(void);
 @property (nonatomic, copy) NSString *warning;
+@property (nonatomic, strong) UIColor *color;   // title, subtitle and symbol, for a warning row
+@property (nonatomic, copy) NSString *symbol;
 @end
 
 @interface SGModSection : NSObject
@@ -41,6 +43,8 @@ SGModRow *SGFlagRow(NSString *title, NSString *key);   // forces one of Spotify'
 SGModRow *SGKillRow(NSString *title, NSString *key);   // forces a flag Spotify ships on off
 SGModRow *SGStatRow(NSString *title, NSString *(^value)(void));
 SGModRow *SGActionRow(NSString *title, NSString *subtitle, void (^action)(void));
+// Red, with a warning symbol: something is wrong and tapping the row says what to do about it.
+SGModRow *SGWarningRow(NSString *title, NSString *subtitle, void (^action)(void));
 SGModRow *SGPageRow(NSString *title, UIViewController *(^page)(void));
 SGModRow *SGLinkRow(NSString *title, NSString *subtitle, NSString *url);
 SGModRow *SGStatActionRow(NSString *title, NSString *subtitle, NSString *(^value)(void), void (^action)(void));

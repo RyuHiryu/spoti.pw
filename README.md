@@ -55,7 +55,23 @@ No IPA is distributed in this repo. [spoti.pw](https://spoti.pw) carries the cur
 it is also a source for SideStore, AltStore and Feather: add `https://spoti.pw` and later builds
 arrive on their own. Mod Settings → Updates checks the same place.
 
-The app installs as `com.spotify.client2`, next to the real Spotify rather than over it.
+The app keeps Spotify's own bundle id, `com.spotify.client`, so it installs over the real Spotify
+rather than next to it. That is deliberate: a rewritten bundle id has to match the App ID of the
+profile you sign with, and this build cannot know which profile that will be. Sign a mismatched
+pair and the app installs fine, but tapping the now playing card on the lock screen opens nothing.
+
+### Signing it yourself
+
+Which is what you have to watch for. Feather does not touch the bundle id unless you tell it to, so
+with a certificate whose App ID is fixed you end up with exactly that mismatched pair: set
+**Identifier** in Feather's signing options to the App ID shown in its certificates tab, and leave
+**PPQ protection** off, since it appends a random string to the bundle id and breaks the match
+again. AltStore, SideStore and Sideloadly register an App ID from the bundle id themselves and need
+none of this.
+
+You do not have to work out which of the two you got. A build the lock screen cannot open says so
+once on its first launch, and carries a red row at the top of Mod Settings for as long as it lasts;
+either one names the bundle id to sign under and copies it to the clipboard.
 
 ## Build it yourself
 
@@ -83,7 +99,9 @@ Put the decrypted `.ipa` in `ipa/`, then:
     make install    # the same, signed with your certificate and pushed to the iPhone over USB
 
 `make install` reads `SIGN_P12`, `SIGN_PROFILE` and `SIGN_P12_PASSWORD` from `.signing.env`; copy
-`.signing.env.example` and fill it in. `BUNDLE_ID=` overrides the bundle id.
+`.signing.env.example` and fill it in. It signs under the App ID of your profile, which is what keeps
+the lock screen player working; `BUNDLE_ID=` overrides the bundle id, and is only safe when you know
+it equals that App ID.
 
 The first build spends about a minute reading Spotify's remote-config flags out of your IPA into
 `tweak/Sources/Features/Flags/SGFlagList.m`, so the flag list always matches the Spotify you built from. Later builds

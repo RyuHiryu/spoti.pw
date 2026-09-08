@@ -3,11 +3,13 @@
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
 
+#if !__has_include(<UIKit/UIGlassEffect.h>)
 @interface UIGlassEffect : UIVisualEffect
 + (instancetype)effectWithStyle:(NSInteger)style;
 @property (nonatomic, copy) UIColor *tintColor;
 @property (nonatomic, getter=isInteractive) BOOL interactive;
 @end
+#endif
 
 @interface NSObject (SGiOS26)
 + (id)capsuleConfiguration;

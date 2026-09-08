@@ -7,6 +7,11 @@ BOOL SGEnabled(NSString *key);   // an unset switch is on
 BOOL SGHidden(NSString *key);    // an unset switch is off
 void SGSetEnabled(NSString *key, BOOL on);
 
+// A setting picked from a list, stored as the index into it; the choice rows of
+// Settings/SGModPage.h write these.
+NSInteger SGInt(NSString *key, NSInteger fallback);
+void SGSetInt(NSString *key, NSInteger value);
+
 // Overrides of Spotify's remote-config flags, stored under SGFlagOverridePrefix + flag key;
 // nil keeps Spotify's value. Features/Flags reads them, the All flags page and flag rows write them.
 extern NSString *const SGFlagOverridePrefix;

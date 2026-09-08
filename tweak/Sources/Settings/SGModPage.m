@@ -87,6 +87,90 @@ SGModRow *SGPageRow(NSString *title, UIViewController *(^page)(void)) {
     return row;
 }
 
+// The list a choice row opens: the names it was given, a green checkmark against the one set.
+// Picking one writes the index and goes back, where the row it came from reads the new name out
+// and the page it sits on rebuilds around it.
+@interface SGChoicePage : SGPage
+- (instancetype)initWithTitle:(NSString *)title key:(NSString *)key choices:(NSArray<NSString *> *)choices fallback:(NSInteger)fallback;
+@end
+
+@implementation SGChoicePage {
+    NSString *_key;
+    NSArray<NSString *> *_choices;
+    NSInteger _fallback;
+}
+
+- (instancetype)initWithTitle:(NSString *)title key:(NSString *)key choices:(NSArray<NSString *> *)choices fallback:(NSInteger)fallback {
+    if (!(self = [super initWithStyle:UITableViewStyleGrouped])) return nil;
+    self.title = title;
+    _key = key;
+    _choices = choices;
+    _fallback = fallback;
+    return self;
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.overrideUserInterfaceStyle = UIUserInterfaceStyleDark;
+    self.tableView.backgroundColor = SGPageBackground();
+    self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    self.tableView.sectionHeaderTopPadding = 0;
+}
+
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    SGInsetForBars(self.tableView);
+}
+
+- (NSInteger)tableView:(UITableView *)table numberOfRowsInSection:(NSInteger)section {
+    return (NSInteger)_choices.count;
+}
+
+- (CGFloat)tableView:(UITableView *)table heightForHeaderInSection:(NSInteger)section {
+    return CGFLOAT_MIN;
+}
+
+- (CGFloat)tableView:(UITableView *)table heightForFooterInSection:(NSInteger)section {
+    return CGFLOAT_MIN;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)table cellForRowAtIndexPath:(NSIndexPath *)path {
+    UITableViewCell *cell = SGDequeueCell(table, @"choice");
+    SGFillCell(cell, _choices[(NSUInteger)path.row], nil, nil, nil);
+    cell.selectionStyle = UITableViewCellSelectionStyleDefault;
+    if (path.row == SGInt(_key, _fallback)) {
+        UIImageView *tick = SGSymbolView(@"checkmark", 13, UIImageSymbolWeightSemibold, 16);
+        tick.tintColor = SGGreen();
+        cell.accessoryView = tick;
+    }
+    return cell;
+}
+
+- (void)tableView:(UITableView *)table didSelectRowAtIndexPath:(NSIndexPath *)path {
+    [table deselectRowAtIndexPath:path animated:NO];
+    SGSetInt(_key, path.row);
+    [table reloadData];
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+@end
+
+// No key on the row: the key lives in the blocks, so the page draws the row as the link it is
+// rather than as a switch.
+SGModRow *SGChoiceRow(NSString *title, NSString *subtitle, NSString *key, NSArray<NSString *> *choices, NSInteger fallback) {
+    SGModRow *row = [SGModRow new];
+    row.title = title;
+    row.subtitle = subtitle;
+    row.value = ^NSString *{
+        NSInteger index = SGInt(key, fallback);
+        return index >= 0 && index < (NSInteger)choices.count ? choices[(NSUInteger)index] : choices.firstObject;
+    };
+    row.page = ^UIViewController *{
+        return [[SGChoicePage alloc] initWithTitle:title key:key choices:choices fallback:fallback];
+    };
+    return row;
+}
+
 SGModRow *SGLinkRow(NSString *title, NSString *subtitle, NSString *url) {
     return SGActionRow(title, subtitle, ^{ SGOpenURL(url); });
 }
@@ -107,6 +191,24 @@ SGModSection *SGSection(NSString *title, NSArray<SGModRow *> *rows) {
     s.title = title;
     s.rows = rows;
     return s;
+}
+
+// What a page row carrying a value shows on the right: the value, then the chevron, the same
+// distance apart as Spotify's own rows keep them.
+static UIView *valueAndChevron(NSString *text) {
+    UILabel *label = [UILabel new];
+    label.font = SGTitleFont();
+    label.textColor = SGGrey();
+    label.text = text;
+    [label sizeToFit];
+    UIImageView *chevron = SGSymbolView(@"chevron.right", 13, UIImageSymbolWeightSemibold, 16);
+    CGFloat height = MAX(label.bounds.size.height, chevron.bounds.size.height);
+    UIView *box = [[UIView alloc] initWithFrame:CGRectMake(0, 0, label.bounds.size.width + 6 + chevron.bounds.size.width, height)];
+    label.center = CGPointMake(label.bounds.size.width / 2, height / 2);
+    chevron.center = CGPointMake(box.bounds.size.width - chevron.bounds.size.width / 2, height / 2);
+    [box addSubview:label];
+    [box addSubview:chevron];
+    return box;
 }
 
 // On means the row's own override is in place; anything else, including the opposite override
@@ -136,7 +238,9 @@ static BOOL flagRowLocked(SGModRow *row) {
     _sections = sections;
     _intro = intro ? SGNote(intro) : nil;
     _footer = footer ? SGNote(footer) : nil;
-    for (SGModSection *s in sections) for (SGModRow *row in s.rows) _live |= row.value != nil;
+    // A page row reads its value out when the page appears rather than on the ticker, so only the
+    // rows whose numbers climb on their own keep one running.
+    for (SGModSection *s in sections) for (SGModRow *row in s.rows) _live |= row.value && !row.page;
     return self;
 }
 
@@ -163,8 +267,10 @@ static BOOL flagRowLocked(SGModRow *row) {
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    if (!_live) return;
+    // Reloaded whether or not anything ticks: a choice row is showing whatever was picked on the
+    // page it opened, which is gone by the time this one comes back.
     [self.tableView reloadData];
+    if (!_live) return;
     // The counters climb while the page is open; the labels are written straight into the cells so
     // that a reload never lands under a switch being dragged.
     _ticker = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(readValues) userInfo:nil repeats:YES];
@@ -180,7 +286,7 @@ static BOOL flagRowLocked(SGModRow *row) {
     for (UITableViewCell *cell in self.tableView.visibleCells) {
         SGModRow *row = [self rowAt:[self.tableView indexPathForCell:cell]];
         UILabel *label = (UILabel *)cell.accessoryView;
-        if (!row.value || ![label isKindOfClass:UILabel.class]) continue;
+        if (!row.value || row.page || ![label isKindOfClass:UILabel.class]) continue;
         label.text = row.value();
         [label sizeToFit];
         [cell setNeedsLayout];
@@ -232,7 +338,7 @@ static BOOL flagRowLocked(SGModRow *row) {
         [toggle addTarget:self action:@selector(toggled:) forControlEvents:UIControlEventValueChanged];
         cell.accessoryView = toggle;
     } else if (row.page) {
-        cell.accessoryView = SGSymbolView(@"chevron.right", 13, UIImageSymbolWeightSemibold, 16);
+        cell.accessoryView = row.value ? valueAndChevron(row.value()) : SGSymbolView(@"chevron.right", 13, UIImageSymbolWeightSemibold, 16);
         cell.selectionStyle = UITableViewCellSelectionStyleDefault;
     } else if (row.value) {
         UILabel *label = [UILabel new];

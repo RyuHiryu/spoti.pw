@@ -35,7 +35,7 @@ jailbreak. Every piece sits behind its own switch in Settings → Mod Settings.
 
 - Spotify's own Liquid Glass, every flag of it on at once
 - Glass now playing bar, player header, search field and lyrics card
-- Pure black AMOLED, and a Home gradient
+- Pure black AMOLED, and a Home gradient in any of eight colours
 - A tab bar you reorder, hide and add any `spotify:` link to
 - Queue as a bottom sheet, swipe a row to play next
 - Like and dislike back on the lock screen widget, animated artwork on it

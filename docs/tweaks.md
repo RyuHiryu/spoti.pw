@@ -44,7 +44,7 @@ app:
 
 A hook reads its switch when it runs (`SGEnabled`, `SGHidden`, `SGFlag` from Core/SGPrefs.h), so a
 change shows after Spotify restarts; Navbar is the exception and applies as soon as the bar lays
-out again. The root page in `Settings/SGModSettings.x` lists every feature's page by hand.
+out again, as are the Home gradient's colour, strength and height, but not the switch that turns it on. The root page in `Settings/SGModSettings.x` lists every feature's page by hand.
 
 ## Make targets
 
@@ -59,8 +59,9 @@ out again. The root page in `Settings/SGModSettings.x` lists every feature's pag
 ## Mod Settings
 
 Settings → Mod Settings lists its pages without a description each, so the list reads as a list: UI
-Tweaks (tab bar, search field, Spotify's own glass, AMOLED), Home & Library (a gradient background,
-hide sections of the Home tab, Spotify's home and library flags), Playlist (hide the cover, the
+Tweaks (tab bar, search field, Spotify's own glass, AMOLED), Home & Library (a Gradient page: the wash behind the top of
+Home in one of eight colours, at three strengths and four heights; then hide sections of the Home
+tab and Spotify's home and library flags), Playlist (hide the cover, the
 header's text and buttons, the curation pills), Now Playing (glass, Spotify's player flags, hide
 buttons and cards of the full screen player, and a Lyrics page under it), Lock screen widget,
 Playback (speed, queue, the player and the now playing bar), Ads & nags (every switch forces a flag

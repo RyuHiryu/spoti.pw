@@ -4,8 +4,9 @@
 // A row is a switch when it has a key and a link to another page when it has a page. A flag row
 // switches one of Spotify's remote-config flags: on forces it (off for a forceOff row, which is how
 // a flag Spotify ships on is turned off), the switch off leaves Spotify's own value. A row
-// with a value reads one out on the right and is asked again while the page is open; a row with an
-// action runs it when tapped.
+// with a value reads one out on the right and is asked again while the page is open; a page row
+// with a value reads it out too, next to the chevron, and is asked when the page appears. A row
+// with an action runs it when tapped.
 @interface SGModRow : NSObject
 @property (nonatomic, copy) NSString *title;
 @property (nonatomic, copy) NSString *subtitle;
@@ -46,6 +47,9 @@ SGModRow *SGActionRow(NSString *title, NSString *subtitle, void (^action)(void))
 // Red, with a warning symbol: something is wrong and tapping the row says what to do about it.
 SGModRow *SGWarningRow(NSString *title, NSString *subtitle, void (^action)(void));
 SGModRow *SGPageRow(NSString *title, UIViewController *(^page)(void));
+// A setting picked from a list of names, stored under `key` as the index into it: the row reads the
+// name of the current one out and opens a list of them, a checkmark against that one.
+SGModRow *SGChoiceRow(NSString *title, NSString *subtitle, NSString *key, NSArray<NSString *> *choices, NSInteger fallback);
 SGModRow *SGLinkRow(NSString *title, NSString *subtitle, NSString *url);
 SGModRow *SGStatActionRow(NSString *title, NSString *subtitle, NSString *(^value)(void), void (^action)(void));
 SGModSection *SGSection(NSString *title, NSArray<SGModRow *> *rows);

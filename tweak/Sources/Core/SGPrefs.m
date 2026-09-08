@@ -17,6 +17,15 @@ void SGSetEnabled(NSString *key, BOOL on) {
     [NSUserDefaults.standardUserDefaults setBool:on forKey:key];
 }
 
+NSInteger SGInt(NSString *key, NSInteger fallback) {
+    id value = [NSUserDefaults.standardUserDefaults objectForKey:key];
+    return value ? [value integerValue] : fallback;
+}
+
+void SGSetInt(NSString *key, NSInteger value) {
+    [NSUserDefaults.standardUserDefaults setInteger:value forKey:key];
+}
+
 NSString *const SGFlagOverridePrefix = @"spotifyglass.flag.";
 
 id SGFlagOverride(NSString *key) {

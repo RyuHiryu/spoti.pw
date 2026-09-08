@@ -33,9 +33,7 @@ UIViewController *SGNowPlayingSettingsPage(void) {
             SGFlagRow(@"Expand the sticky header on tap", @"ios-feature-nowplaying.expand_sticky_header_on_tap"),
             SGFlagRow(@"Redesigned header with context menu", @"ios-feature-nowplaying.new_redesign_header_with_context_menu_enabled"),
             SGFlagRow(@"Video in the mini player", @"ios-feature-nowplaying.video_in_miniplayer"),
-        ]),
-        SGSection(@"Turn off", @[
-            SGKillRow(@"Canvas", @"ios-feature-canvas.canvas_enabled"),
+            SGKillRow(@"Disable Canvas", @"ios-feature-canvas.canvas_enabled"),
         ]),
         SGSection(@"Hide buttons", @[
             SGHideRow(@"Shuffle", @"Left of the playback controls", SGHideShuffle),

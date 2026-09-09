@@ -35,13 +35,11 @@ NSArray<SGModSection *> *SGPlaybackSections(void) {
     ];
 }
 
-// Every flag switch here forces a flag Spotify ships on to off, so the titles name the blocking: on
-// stops the thing, off is Spotify's own value. The telemetry sections come from Privacy.
-UIViewController *SGAdsSettingsPage(void) {
-    NSMutableArray<SGModSection *> *sections = [NSMutableArray arrayWithArray:@[
-        SGSection(nil, @[
-            SGPageRow(@"Ad blocking", ^UIViewController *{ return SGAdBlockSettingsPage(); }),
-        ]),
+// Every switch here forces a flag Spotify ships on to off, so the titles name the blocking: on stops
+// the thing, off is Spotify's own value. Hide ads and Hide upsells already force the first two
+// sections off, which locks those rows.
+static UIViewController *adFlagsPage(void) {
+    return [[SGModPage alloc] initWithTitle:@"Ad and upsell flags" intro:SGRestartNote sections:@[
         SGSection(@"Ads", @[
             SGKillRow(@"Block the ad when the app opens", @"ios-feature-adonappopen.enabled"),
             SGKillRow(@"Block its CTA card", @"ios-feature-adonappopen.cta_card_enabled"),
@@ -69,10 +67,19 @@ UIViewController *SGAdsSettingsPage(void) {
         SGSection(nil, @[
             SGFlagRow(@"Reduce interventions", @"ios-messaging-reduceinterventions-impl.enabled"),
         ]),
-    ]];
+    ] footer:@"The tooltip switches belong to Spotify's own intervention-reduction system, which Reduce interventions turns on."];
+}
+
+// The switches first, the flags they already cover behind a page of their own: turning Hide ads on
+// is what most of this page is for, and every row under it follows from that one.
+UIViewController *SGAdsSettingsPage(void) {
+    NSMutableArray<SGModSection *> *sections = [NSMutableArray arrayWithArray:SGAdBlockSections()];
+    [sections addObject:SGSection(nil, @[
+        SGPageRow(@"Ad and upsell flags", ^UIViewController *{ return adFlagsPage(); }),
+    ])];
     [sections addObjectsFromArray:SGPrivacySections()];
-    return [[SGModPage alloc] initWithTitle:@"Ads & privacy" intro:SGRestartNote sections:sections
-                                     footer:@"The tooltip switches belong to Spotify's own intervention-reduction system, which Reduce interventions turns on."];
+    return [[SGModPage alloc] initWithTitle:@"Premium & ads" intro:SGRestartNote sections:sections
+                                     footer:@"The three switches come from EeveeSpotify and are off until switched on; none is needed on a Premium account, which has no ads to block. Audio ads between songs are Spoof Premium's to stop, the other two only reach what is drawn."];
 }
 
 static UIViewController *martiniPage(void) {

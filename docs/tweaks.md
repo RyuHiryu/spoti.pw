@@ -73,11 +73,11 @@ glass tab bar, search field and Spotify's own glass, AMOLED and the accent colou
 four heights; then hide sections of the Home tab and Spotify's home and library flags), Playlist
 (hide the cover, the header's text and buttons, the curation pills) and Player (glass, Spotify's
 player flags, hide buttons and cards of the full screen player, then the queue, controls and now
-playing bar flags, the lock screen widget's, and a Lyrics page under it). Ads & privacy (every flag
-switch forces a flag Spotify ships on to off: the ad on app open, upsells, tooltips, the DJ badge;
-an Ad blocking page under it, EeveeSpotify's layers behind three switches that start off: hide ads,
-hide upsells and pretend to be Premium, with a count of what each stopped; then telemetry blocking
-with a count of what it has stopped) and Labs (features Spotify built and did not ship, and AI Chat
+playing bar flags, the lock screen widget's, and a Lyrics page under it). Premium & ads (EeveeSpotify's
+three switches, off until switched on: spoof Premium, hide ads and hide upsells, with a count of what
+each stopped; an Ad and upsell flags page under it, every switch forcing a flag Spotify ships on to
+off: the ad on app open, upsells, tooltips, the DJ badge; then telemetry blocking with a count of
+what it has stopped) and Labs (features Spotify built and did not ship, and AI Chat
 (Martini) under it). Then All flags, Spotify's remote-config flags with a search field and an
 Auto / Off / On control per flag (a text field for the number and text ones), and Mod: the build
 and Spotify's version, the update check, the site and the repo, the welcome tour again and Reset

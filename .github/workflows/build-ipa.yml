@@ -22,7 +22,7 @@ jobs:
   build:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: levibostian/action-hide-sensitive-inputs@v1
 
@@ -30,7 +30,7 @@ jobs:
         with:
           xcode-version: latest-stable
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           repository: theos/theos
           path: theos
@@ -52,7 +52,7 @@ jobs:
 
       - run: make release
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         if: inputs.upload_method != 'filebin'
         with:
           name: spoti.ipa

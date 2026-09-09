@@ -1,4 +1,4 @@
-// Pretend to be Premium: the UCS response, which carries the account's product state and its remote
+// Spoof Premium: the UCS response, which carries the account's product state and its remote
 // config, rewritten as it arrives. The attributes and the flag rules are EeveeSpotify's. Offline,
 // audio quality and the social session attributes are left alone: the server still decides those,
 // and a spoofed one only shows UI the request behind it will fail.

@@ -1,8 +1,8 @@
-// Ad blocking: EeveeSpotify's layers, ported. Three switches, each off until asked for. Hide ads
+// EeveeSpotify's layers, ported, at the top of the Premium & ads page. Three switches, each off until asked for. Hide ads
 // keeps the ad services from starting (AdServices.x), takes ad components out of Home and Search
 // before they render (AdHubs.x, Feeds.m) and answers the requests behind them empty (AdNetwork.x).
 // Hide upsells drops the Premium prompts (AdPopups.x, AdServices.x) and forces the flags that show
-// them off (AdBlock.m, through Flags.x). Pretend to be Premium rewrites the product state and remote
+// them off (AdBlock.m, through Flags.x). Spoof Premium rewrites the product state and remote
 // config as they arrive (Premium.m) and keeps the session alive when the server disagrees
 // (AdNetwork.x).
 #import <UIKit/UIKit.h>
@@ -11,13 +11,13 @@
 #define SGKeyHideUpsells @"spotifyglass.adblock.upsells"
 #define SGKeyFakePremium @"spotifyglass.adblock.premium"
 
-// What a switch turning Pretend to be Premium on is told first.
+// What a switch turning Spoof Premium on is told first.
 extern NSString *const SGFakePremiumWarning;
 
 // A flag the ads or upsells switch forces off while it is on. Flags.x asks, and the row for it locks.
 BOOL SGAdBlockForcesFlagOff(NSString *key);
 
-// What the hooks stopped, by kind, for the Ad blocking page (nil label for all of them).
+// What the hooks stopped, by kind, for the counts under the switches (nil label for all of them).
 void SGAdBlockCountOne(NSString *label);
 NSArray<NSString *> *SGAdBlockLabels(void);
 NSUInteger SGAdBlockCount(NSString *label);
@@ -32,4 +32,6 @@ NSData *SGPatchBootstrap(NSData *body);
 // were none, or the bytes were not the shape expected.
 NSData *SGStripFeed(NSData *body);
 
-UIViewController *SGAdBlockSettingsPage(void);
+@class SGModSection;
+// The three switches and what they have stopped, at the top of the Premium & ads page.
+NSArray<SGModSection *> *SGAdBlockSections(void);

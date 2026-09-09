@@ -339,7 +339,7 @@ static SGTourRow *actionRow(NSString *symbol, NSString *title, NSString *subtitl
     __weak typeof(self) weakSelf = self;
     SGTourRow *glass = switchRow(@"drop.fill", @"Liquid Glass UI", @"Spotify's own glass bars and sheets, the search field, now playing bar, artwork background and lyrics", SGKeySpotifyGlass, NO);
     glass.changed = ^(BOOL on) { SGSetLiquidGlassUI(on); };
-    SGTourRow *premium = switchRow(@"crown.fill", @"Pretend to be Premium", @"Free accounts only", SGKeyFakePremium, NO);
+    SGTourRow *premium = switchRow(@"crown.fill", @"Spoof Premium", @"Free accounts only", SGKeyFakePremium, NO);
     premium.warning = SGFakePremiumWarning;
     NSMutableArray *pages = [NSMutableArray array];
     _pages = pages;
@@ -354,10 +354,10 @@ static SGTourRow *actionRow(NSString *symbol, NSString *title, NSString *subtitl
         switchRow(@"moon.fill", @"AMOLED background", @"Pure black instead of Spotify's dark grey", SGKeyAmoled, NO),
         switchRow(@"paintpalette.fill", @"Home gradient", @"A wash of colour behind the top of Home", SGKeyHomeGradient, NO),
     ]]];
-    [pages addObject:[self pageWithSymbol:@"eye.slash.fill" heading:@"Ads and privacy." body:@"The ad switches come from EeveeSpotify, off until switched on and not needed on a Premium account. Telemetry blocking is on from the start." rows:@[
+    [pages addObject:[self pageWithSymbol:@"eye.slash.fill" heading:@"Premium and ads." body:@"The ad switches come from EeveeSpotify, off until switched on and not needed on a Premium account. Telemetry blocking is on from the start." rows:@[
+        premium,
         switchRow(@"speaker.slash.fill", @"Hide ads", @"Ad services never start, ad slots leave Home and Search", SGKeyHideAds, NO),
         switchRow(@"hand.raised.fill", @"Hide upsells", @"Premium prompts, banners and sheets dropped", SGKeyHideUpsells, NO),
-        premium,
         switchRow(@"antenna.radiowaves.left.and.right.slash", @"Block telemetry", @"Analytics requests answered empty instead of let out", SGKeyBlockTelemetry, YES),
     ]]];
     SGTourRow *lyricsOnly = switchRow(@"rectangle.compress.vertical", @"Only the lyrics", @"Hides every card under the player except lyrics: about the artist, videos, song DNA, credits, merch and the rest", SGKeyPlayerLyricsOnly, NO);

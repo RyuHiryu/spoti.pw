@@ -11,4 +11,4 @@ NSUInteger SGBlockedCount(NSString *label);
 void SGResetBlocked(void);
 
 @class SGModSection;
-NSArray<SGModSection *> *SGPrivacySections(void);   // the telemetry rows of the Ads & privacy page
+NSArray<SGModSection *> *SGPrivacySections(void);   // the telemetry rows of the Premium & ads page

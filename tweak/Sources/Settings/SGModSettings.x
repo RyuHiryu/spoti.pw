@@ -1,7 +1,7 @@
 // Settings: a Mod Settings row at the end of Spotify's settings list opens the mod's own pages:
 // Appearance (with the Navbar, the tab bar's own composition, under it), Home & Library, Playlist
 // and Player, each sections of switches (the mod's own and a few of Spotify's remote-config
-// flags), Ads & privacy and Labs, All flags, a searchable list of every flag with an override per
+// flags), Premium & ads and Labs, All flags, a searchable list of every flag with an override per
 // flag, and Mod, the build, its updates and links. The same row leads the side drawer's list
 // (trees/test6.txt), above Your plan, so the page is a tap from Home. The tweaks read the switches
 // when they run, so a change shows after Spotify restarts; the Navbar page is the exception and
@@ -49,7 +49,7 @@ static UIViewController *modSettingsPage(void) {
             pageRow(@"Player", @"play.circle", ^UIViewController *{ return SGNowPlayingSettingsPage(); }),
         ]),
         SGSection(nil, @[
-            pageRow(@"Ads & privacy", @"shield", ^UIViewController *{ return SGAdsSettingsPage(); }),
+            pageRow(@"Premium & ads", @"crown", ^UIViewController *{ return SGAdsSettingsPage(); }),
             pageRow(@"Labs", @"testtube.2", ^UIViewController *{ return SGLabsPage(); }),
         ]),
         SGSection(nil, @[

@@ -1,6 +1,6 @@
 // Spotify's responses on their way in, through the URLSession delegates it reads them by:
 // SPTDataLoaderService for most of spclient, HttpClientURLSession for what some regions route the
-// other way. A request for an ad is answered empty. With Pretend to be Premium on, the bootstrap
+// other way. A request for an ad is answered empty. With Spoof Premium on, the bootstrap
 // and customize bodies are rewritten by Premium.m before the client sees them, the endpoints the
 // server would use to log the account out are answered as if they succeeded, and past the first
 // thirty seconds the re-fetches that could bring the real state back are cancelled before they

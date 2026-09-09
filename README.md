@@ -38,7 +38,7 @@ What is in, and what is next.
 - [x] Liquid Glass, every flag of it at once
 - [x] AMOLED black, Home gradient
 - [x] Ad blocking
-- [x] Pretend to be Premium
+- [x] Spoof Premium
 - [x] Tracker blocking
 - [x] Custom tab bar
 - [x] Double tap zones on the player
